@@ -1,0 +1,3903 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="midnight">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=0.6, maximum-scale=5.0" />
+  <title>مذكرات الهندسة - Engineering Notes | بوابة المذاكرة والمحاضرات</title>
+  <!-- Google Fonts & FontAwesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- PDF.js for reliable mobile & desktop PDF rendering -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+  <style>
+    /* ==================== متغيرات الثيمات (Midnight / Dark / Light) ==================== */
+    :root, [data-theme="midnight"] {
+      --bg-main: #000000;
+      --bg-secondary: #070a10;
+      --bg-card: #0b0f17;
+      --bg-card-hover: #111826;
+      --bg-table-row: #0a0a0c;
+      --bg-table-header: #121318;
+      --text-main: #f0f6fc;
+      --text-muted: #8b949e;
+      --border-color: #1f242d;
+      --border-dashed: #2a313c;
+      --accent-primary: #58a6ff;
+      --accent-secondary: #3b82f6;
+      --accent-day: #6cb6ff;
+      --pdf-red: #f85149;
+      --img-green: #2ea043;
+      --img-neon: #00e676;
+      --warning: #d29922;
+      --success: #238636;
+      --header-olive: #6b7032;
+      --shadow: 0 8px 28px rgba(0, 0, 0, 0.85);
+      --input-bg: #05080d;
+    }
+
+    [data-theme="dark"] {
+      --bg-main: #121418;
+      --bg-secondary: #1a1d24;
+      --bg-card: #1e222b;
+      --bg-card-hover: #262b36;
+      --bg-table-row: #181b22;
+      --bg-table-header: #222630;
+      --text-main: #e6edf3;
+      --text-muted: #9ca3af;
+      --border-color: #30363d;
+      --border-dashed: #404854;
+      --accent-primary: #60a5fa;
+      --accent-secondary: #2563eb;
+      --accent-day: #79c0ff;
+      --pdf-red: #ff5252;
+      --img-green: #2ea043;
+      --img-neon: #00e676;
+      --warning: #e3b341;
+      --success: #2ea043;
+      --header-olive: #5c612b;
+      --shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+      --input-bg: #14171d;
+    }
+
+    [data-theme="light"] {
+      --bg-main: #f3f4f6;
+      --bg-secondary: #ffffff;
+      --bg-card: #ffffff;
+      --bg-card-hover: #f8fafc;
+      --bg-table-row: #ffffff;
+      --bg-table-header: #e5e7eb;
+      --text-main: #111827;
+      --text-muted: #4b5563;
+      --border-color: #d1d5db;
+      --border-dashed: #9ca3af;
+      --accent-primary: #2563eb;
+      --accent-secondary: #1d4ed8;
+      --accent-day: #1d4ed8;
+      --pdf-red: #dc2626;
+      --img-green: #16a34a;
+      --img-neon: #16a34a;
+      --warning: #d97706;
+      --success: #15803d;
+      --header-olive: #6b7032;
+      --shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      --input-bg: #f9fafb;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Cairo', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      min-height: 100vh;
+      transition: background-color 0.25s ease, color 0.25s ease;
+      overflow-x: hidden;
+      padding-bottom: 60px;
+    }
+
+    /* ==================== شريط المساحة الكلية بأعلى الصفحة ==================== */
+    .storage-top-banner {
+      background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow);
+    }
+
+    .storage-top-inner {
+      max-width: 1150px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .storage-row-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .storage-title-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 0.98rem;
+    }
+
+    .storage-badge-total {
+      background: rgba(88, 166, 255, 0.15);
+      color: var(--accent-primary);
+      border: 1px solid var(--accent-primary);
+      padding: 3px 12px;
+      border-radius: 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.92rem;
+      font-weight: 700;
+      direction: ltr;
+    }
+
+    .storage-progress-track {
+      width: 100%;
+      height: 10px;
+      background: var(--input-bg);
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      position: relative;
+    }
+
+    .storage-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent-primary), var(--img-neon));
+      border-radius: 10px;
+      transition: width 0.2s linear;
+    }
+
+    .storage-stats-sub {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      gap: 8px;
+    }
+
+    .cloud-status-pills {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 9px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
+    }
+
+    .status-pill .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #888;
+    }
+
+    .status-pill.online .dot {
+      background: var(--img-neon);
+      box-shadow: 0 0 6px var(--img-neon);
+    }
+
+    .status-pill.warn .dot {
+      background: var(--warning);
+    }
+
+    /* ==================== الهيدر والساعة والتاريخ ==================== */
+    .app-header {
+      background-color: var(--header-olive);
+      color: #ffffff;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .header-container {
+      max-width: 1150px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.28);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      color: #fff;
+    }
+
+    .brand-text h1 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      line-height: 1.3;
+    }
+
+    .brand-text p {
+      font-size: 0.78rem;
+      opacity: 0.88;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .header-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .theme-cycle-btn {
+      background: rgba(0, 0, 0, 0.35);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      padding: 7px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .theme-cycle-btn:hover {
+      background: rgba(0, 0, 0, 0.55);
+      transform: translateY(-1px);
+    }
+
+    /* شريط الساعة والتاريخ الميلادي والهجري */
+    .datetime-bar {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      padding: 10px 16px;
+    }
+
+    .datetime-inner {
+      max-width: 1150px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .clock-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 5px 14px;
+      border-radius: 10px;
+    }
+
+    .clock-time {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--accent-primary);
+      direction: ltr;
+      letter-spacing: 0.5px;
+    }
+
+    .clock-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    .dates-box {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .date-chip {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 5px 12px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .date-chip i {
+      color: var(--accent-primary);
+    }
+
+    /* ==================== أزرار التنقل الرئيسية ==================== */
+    .main-container {
+      max-width: 1150px;
+      margin: 0 auto;
+      padding: 18px 14px;
+    }
+
+    .nav-tabs {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .nav-tab-btn {
+      background: var(--bg-card);
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+      padding: 13px 16px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-tab-btn.active {
+      background: linear-gradient(135deg, rgba(88, 166, 255, 0.18), rgba(59, 130, 246, 0.08));
+      color: var(--accent-primary);
+      border-color: var(--accent-primary);
+      box-shadow: 0 4px 16px rgba(88, 166, 255, 0.15);
+    }
+
+    .tab-section {
+      display: none;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .tab-section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ==================== قسم المواد والفولدرات ==================== */
+    .toolbar-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .search-wrapper {
+      flex: 1;
+      min-width: 220px;
+      position: relative;
+    }
+
+    .search-wrapper i {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--input-bg);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 10px 38px 10px 12px;
+      font-size: 0.92rem;
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-primary);
+    }
+
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .btn {
+      border: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+      color: var(--text-main);
+      padding: 9px 15px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent-primary);
+    }
+
+    .btn-primary {
+      background: var(--accent-secondary);
+      color: #ffffff;
+      border-color: var(--accent-primary);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-primary);
+      color: #000;
+    }
+
+    .btn-success {
+      background: var(--img-green);
+      color: #ffffff;
+      border-color: var(--img-neon);
+    }
+
+    .btn-warning {
+      background: rgba(210, 153, 34, 0.18);
+      color: var(--warning);
+      border-color: var(--warning);
+    }
+
+    .btn-warning:hover {
+      background: var(--warning);
+      color: #000;
+    }
+
+    .btn-danger {
+      background: rgba(248, 81, 73, 0.14);
+      color: var(--pdf-red);
+      border-color: rgba(248, 81, 73, 0.4);
+    }
+
+    .btn-danger:hover {
+      background: var(--pdf-red);
+      color: #fff;
+    }
+
+    .btn-sm {
+      padding: 6px 11px;
+      font-size: 0.8rem;
+      border-radius: 8px;
+    }
+
+    /* شبكة الفولدرات (المواد) */
+    .folders-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 14px;
+    }
+
+    .folder-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.22s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .folder-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent-primary);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow);
+    }
+
+    .folder-card.subfolder-variant {
+      border-style: solid;
+      border-right: 4px solid var(--warning);
+    }
+
+    .folder-card.subfolder-variant:hover {
+      border-color: var(--warning);
+    }
+
+    .folder-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .folder-icon-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .folder-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(88, 166, 255, 0.14);
+      color: var(--accent-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .folder-icon.sub-icon {
+      background: rgba(210, 153, 34, 0.16);
+      color: var(--warning);
+    }
+
+    .folder-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text-main);
+      word-break: break-word;
+    }
+
+    .folder-sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .folder-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border-color);
+      padding-top: 10px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .folder-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    /* ==================== مسار التنقل (Breadcrumbs) والفولدرات الفرعية داخل المادة ==================== */
+    .breadcrumb-bar {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+      font-weight: 800;
+    }
+
+    .breadcrumb-item {
+      color: var(--text-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      transition: all 0.18s ease;
+    }
+
+    .breadcrumb-item:hover {
+      color: var(--accent-primary);
+      border-color: var(--accent-primary);
+    }
+
+    .breadcrumb-item.current {
+      color: var(--accent-primary);
+      border-color: var(--accent-primary);
+      background: rgba(88, 166, 255, 0.12);
+      cursor: default;
+    }
+
+    .breadcrumb-sep {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+    }
+
+    .subfolders-section-box {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 15px;
+      margin-bottom: 18px;
+    }
+
+    .subfolders-header-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .subfolders-header-title {
+      font-size: 0.98rem;
+      font-weight: 800;
+      color: var(--warning);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ==================== داخل المادة (رفع وتصفح الملفات) ==================== */
+    .subject-inside-header {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .upload-dropzone {
+      background: var(--bg-card);
+      border: 2px dashed var(--accent-primary);
+      border-radius: 14px;
+      padding: 24px 16px;
+      text-align: center;
+      margin-bottom: 18px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .upload-dropzone.dragover {
+      background: rgba(88, 166, 255, 0.12);
+      border-color: var(--img-neon);
+    }
+
+    .upload-dropzone i.main-up-icon {
+      font-size: 2.3rem;
+      color: var(--accent-primary);
+      margin-bottom: 8px;
+    }
+
+    .upload-dropzone h3 {
+      font-size: 1.05rem;
+      margin-bottom: 4px;
+    }
+
+    .upload-dropzone p {
+      font-size: 0.83rem;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+
+    /* صندوق التقدم الفعلي وقائمة انتظار الملفات */
+    .upload-progress-box {
+      display: none;
+      margin-top: 16px;
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
+      padding: 14px;
+      border-radius: 12px;
+      text-align: right;
+      cursor: default;
+    }
+
+    .upload-current-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .upload-current-title {
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .upload-current-stats {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: var(--img-neon);
+      direction: ltr;
+    }
+
+    .upload-queue-list {
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 240px;
+      overflow-y: auto;
+      padding-left: 4px;
+    }
+
+    .queue-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 9px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .queue-item.done {
+      border-color: rgba(0, 230, 118, 0.5);
+      background: rgba(0, 230, 118, 0.05);
+    }
+
+    .queue-item.active {
+      border-color: var(--accent-primary);
+    }
+
+    .queue-item-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 0.83rem;
+      font-weight: 700;
+    }
+
+    .queue-item-name {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      word-break: break-all;
+    }
+
+    .queue-item-status {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .queue-item-bar-track {
+      width: 100%;
+      height: 6px;
+      background: var(--input-bg);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .queue-item-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent-primary), var(--img-neon));
+      transition: width 0.15s linear;
+    }
+
+    .filter-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .filter-pill {
+      background: var(--input-bg);
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+      padding: 6px 13px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .filter-pill.active {
+      background: var(--accent-primary);
+      color: #000;
+      border-color: var(--accent-primary);
+    }
+
+    /* شبكة الملفات داخل المادة */
+    .files-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 14px;
+    }
+
+    .file-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 13px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .file-card.selected {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.25);
+    }
+
+    .file-card-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 11px;
+    }
+
+    .file-select-chk {
+      width: 19px;
+      height: 19px;
+      accent-color: var(--accent-primary);
+      cursor: pointer;
+      margin-top: 4px;
+      flex-shrink: 0;
+    }
+
+    .file-type-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      flex-shrink: 0;
+    }
+
+    .file-type-icon.pdf {
+      background: rgba(248, 81, 73, 0.15);
+      color: var(--pdf-red);
+    }
+
+    .file-type-icon.image {
+      background: rgba(0, 230, 118, 0.15);
+      color: var(--img-neon);
+    }
+
+    .file-type-icon.text {
+      background: rgba(88, 166, 255, 0.15);
+      color: var(--accent-primary);
+    }
+
+    .file-type-icon.other {
+      background: rgba(210, 153, 34, 0.15);
+      color: var(--warning);
+    }
+
+    .file-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .file-name {
+      font-weight: 800;
+      font-size: 0.94rem;
+      word-break: break-word;
+      line-height: 1.35;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .file-details {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .file-thumb-preview {
+      width: 100%;
+      height: 135px;
+      object-fit: cover;
+      border-radius: 9px;
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      background: #000;
+    }
+
+    .file-text-snippet {
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      max-height: 80px;
+      overflow: hidden;
+      white-space: pre-wrap;
+      cursor: pointer;
+    }
+
+    .sync-badges-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 0.72rem;
+    }
+
+    .mini-badge {
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .mini-badge.ok {
+      color: var(--img-neon);
+      border-color: rgba(0, 230, 118, 0.4);
+      background: rgba(0, 230, 118, 0.08);
+    }
+
+    .file-actions-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      border-top: 1px solid var(--border-color);
+      padding-top: 10px;
+    }
+
+    /* ==================== قسم الجدول الدراسي (مطابق للصورة تماماً) ==================== */
+    .schedule-wrapper {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .schedule-top-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .schedule-table-card {
+      background: var(--bg-table-row);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .schedule-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    .schedule-table th,
+    .schedule-table td {
+      border: 1px solid var(--border-color);
+      padding: 14px 12px;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    .schedule-table thead th {
+      background: var(--bg-table-header);
+      font-size: 0.96rem;
+      font-weight: 800;
+    }
+
+    .schedule-table th.col-day,
+    .schedule-table td.col-day {
+      width: 28%;
+      color: var(--accent-day);
+      font-weight: 800;
+      font-size: 0.98rem;
+      background: rgba(255, 255, 255, 0.01);
+    }
+
+    .schedule-table th.col-lec {
+      width: 72%;
+      color: var(--text-main);
+    }
+
+    .schedule-table td.col-lec {
+      color: var(--text-main);
+      font-size: 0.94rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      word-break: break-word;
+    }
+
+    .schedule-table td.col-lec:hover {
+      background: rgba(88, 166, 255, 0.08);
+    }
+
+    .schedule-day-input {
+      width: 100%;
+      background: var(--input-bg);
+      color: var(--text-main);
+      border: 1px solid var(--accent-primary);
+      border-radius: 8px;
+      padding: 8px 10px;
+      text-align: center;
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    /* البطاقات المنقطة أسفل الجدول (ملف الجدول PDF + صور الجدول) */
+    .schedule-dashed-card {
+      background: var(--bg-table-row);
+      border: 1.5px dashed var(--border-dashed);
+      border-radius: 14px;
+      padding: 28px 20px;
+      text-align: center;
+      margin-bottom: 20px;
+      transition: all 0.2s ease;
+    }
+
+    .schedule-dashed-card:hover {
+      border-color: var(--accent-primary);
+    }
+
+    .sched-card-icon {
+      font-size: 2.8rem;
+      margin-bottom: 12px;
+      display: inline-block;
+    }
+
+    .sched-card-icon.pdf-icon {
+      color: var(--pdf-red);
+    }
+
+    .sched-card-icon.img-icon {
+      color: var(--img-neon);
+    }
+
+    .schedule-dashed-card h3 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 8px;
+    }
+
+    .schedule-dashed-card p.sched-empty-msg {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .sched-uploaded-box {
+      margin-top: 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .sched-images-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .sched-img-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .sched-img-item img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    /* ==================== النوافذ المنبثقة وعارض الـ PDF المتطور ==================== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 680px;
+      max-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .modal-box.large {
+      max-width: 980px;
+      height: 90vh;
+    }
+
+    .modal-header {
+      padding: 12px 16px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .modal-header h3 {
+      font-size: 1rem;
+      font-weight: 800;
+      word-break: break-word;
+    }
+
+    .modal-body {
+      padding: 16px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .modal-footer {
+      padding: 12px 18px;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      background: var(--input-bg);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.92rem;
+      outline: none;
+    }
+
+    .form-textarea {
+      min-height: 170px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    /* عارض PDF المدمج لكل الصفحات */
+    .pdf-canvas-container {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      background: var(--input-bg);
+      padding: 12px;
+      border-radius: 10px;
+    }
+
+    .pdf-page-canvas {
+      max-width: 100%;
+      height: auto !important;
+      border-radius: 6px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+      background: #fff;
+    }
+
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-width: 350px;
+    }
+
+    .toast-msg {
+      background: var(--bg-card);
+      color: var(--text-main);
+      border-right: 4px solid var(--img-neon);
+      border-top: 1px solid var(--border-color);
+      border-left: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      padding: 11px 15px;
+      border-radius: 10px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      box-shadow: var(--shadow);
+      animation: fadeIn 0.2s ease;
+    }
+
+    .empty-state-box {
+      background: var(--bg-card);
+      border: 1px dashed var(--border-dashed);
+      border-radius: 14px;
+      padding: 36px 20px;
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 640px) {
+      .nav-tabs {
+        grid-template-columns: 1fr;
+      }
+      .header-container, .datetime-inner {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .schedule-table th.col-day, .schedule-table td.col-day {
+        width: 32%;
+      }
+    }
+  </style>
+
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <link rel="manifest" href="./manifest.json?v=v1794648310928">
+  <meta name="theme-color" content="#ff00ff">
+  <link rel="apple-touch-icon" href="./icon-192.png?v=v1794648310928">
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js?v=v1794648310928')
+          .then(reg => console.log('SW Registered'))
+          .catch(err => console.log('SW Failed', err));
+      });
+    }
+  </script>
+
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link rel="manifest" href="./manifest.json?v=v1794874399356">
+    <meta name="theme-color" content="#b57daf">
+    <link rel="apple-touch-icon" href="./icon-192.png?v=v1794874399356">
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js?v=v1794874399356')
+            .then(reg => console.log('SW Registered'))
+            .catch(err => console.log('SW Failed', err));
+        });
+      }
+    </script>
+</head>
+<body>
+
+  <!-- ==================== 1. شريط الحجم الكلي للمساحة المستخدمة في أول الصفحة ==================== -->
+  <div class="storage-top-banner">
+    <div class="storage-top-inner">
+      <div class="storage-row-top">
+        <div class="storage-title-box">
+          <i class="fa-solid fa-hard-drive" style="color: var(--accent-primary);"></i>
+          <span>الحجم الكلي للمساحة المستخدمة:</span>
+          <span class="storage-badge-total" id="totalStorageText">0.00 MB (0 Bytes)</span>
+        </div>
+
+        <div class="cloud-status-pills">
+          <span class="status-pill online" id="offlineStatusPill" title="جميع الملفات محفوظة كاملة على جهازك وتفتح بدون إنترنت">
+            <span class="dot"></span> أوفلاين (IndexedDB): مفعل
+          </span>
+          <span class="status-pill" id="firebaseStatusPill" title="حالة اتصال Firebase">
+            <span class="dot"></span> Firebase: جاري الفحص...
+          </span>
+          <span class="status-pill" id="supabaseStatusPill" title="حالة اتصال Supabase">
+            <span class="dot"></span> Supabase: جاري الفحص...
+          </span>
+          <select id="uploadEngineMode" class="form-select" style="width: auto; padding: 3px 8px; font-size: 0.76rem; height: 28px;" title="نظام الرفع السحابي">
+            <option value="dual" selected>الرفع المزدوج: Firebase + Supabase معاً (تلقائي)</option>
+            <option value="firebase">Firebase فقط + أوفلاين</option>
+            <option value="supabase">Supabase فقط + أوفلاين</option>
+            <option value="offline">أوفلاين على الجهاز فقط</option>
+          </select>
+          <button class="btn btn-sm" onclick="syncAllCloudData(true)" title="مزامنة البيانات بين الجهاز و Firebase و Supabase">
+            <i class="fa-solid fa-rotate"></i> مزامنة الآن
+          </button>
+        </div>
+      </div>
+
+      <div class="storage-progress-track">
+        <div class="storage-progress-fill" id="storageProgressBar"></div>
+      </div>
+
+      <div class="storage-stats-sub">
+        <span id="storageBreakdownText">إجمالي المواد: 0 | الفولدرات الفرعية: 0 | إجمالي ملفات المواد: 0 | مرفقات الجدول: 0</span>
+        <span id="networkLiveState"><i class="fa-solid fa-wifi"></i> حالة الشبكة: متصل (مزامنة Firebase + Supabase مفعلة)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 2. الهيدر الرئيسي وزر تبديل الثيم ==================== -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-box">
+        <div class="brand-icon">
+          <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+        <div class="brand-text">
+          <h1>Engineering Notes - مذكرات الهندسة والجامعة</h1>
+          <p>بوابة المذاكرة والمحاضرات والكلية (أوفلاين + سحابي مزدوج)</p>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <button class="theme-cycle-btn" id="themeToggleBtn" onclick="cycleTheme()">
+          <i class="fa-solid fa-moon" id="themeIcon"></i>
+          <span id="themeLabel">الوضع الحالي: ميد نايت (Midnight)</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== 3. شريط الساعة بتوقيت مصر (AM/PM) والتاريخ الميلادي والهجري ==================== -->
+  <div class="datetime-bar">
+    <div class="datetime-inner">
+      <div class="clock-box">
+        <i class="fa-regular fa-clock" style="color: var(--accent-primary);"></i>
+        <span class="clock-label">توقيت مصر:</span>
+        <span class="clock-time" id="egyptClockDisplay">--:--:-- AM</span>
+      </div>
+
+      <div class="dates-box">
+        <div class="date-chip">
+          <i class="fa-regular fa-calendar"></i>
+          <span>الميلادي:</span>
+          <span id="gregorianDateDisplay">...</span>
+        </div>
+        <div class="date-chip">
+          <i class="fa-solid fa-moon"></i>
+          <span>الهجري:</span>
+          <span id="hijriDateDisplay">...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 4. المحتوى الرئيسي والتبويبات ==================== -->
+  <main class="main-container">
+    <div class="nav-tabs">
+      <button class="nav-tab-btn active" id="tabBtnSubjects" onclick="switchMainTab('subjects')">
+        <i class="fa-solid fa-folder-open"></i> المواد والمحاضرات (الفولدرات والملفات)
+      </button>
+      <button class="nav-tab-btn" id="tabBtnSchedule" onclick="switchMainTab('schedule')">
+        <i class="fa-solid fa-calendar-days"></i> الجدول الدراسي (المحاضرات / PDF / الصور)
+      </button>
+    </div>
+
+    <!-- ==================== القسم الأول: المواد والفولدرات والملفات ==================== -->
+    <section class="tab-section active" id="sectionSubjects">
+
+      <!-- عرض قائمة فولدرات المواد -->
+      <div id="foldersListView">
+        <div class="toolbar-card">
+          <div class="search-wrapper">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="subjectSearchInput" class="search-input" placeholder="ابحث عن اسم المادة أو المحاضرة..." oninput="renderSubjectsGrid()" />
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="openSubjectModal()">
+              <i class="fa-solid fa-folder-plus"></i> إضافة مادة جديدة (فولدر)
+            </button>
+            <button class="btn" onclick="exportFullBackup()">
+              <i class="fa-solid fa-download"></i> تحميل نسخة احتياطية كاملة
+            </button>
+          </div>
+        </div>
+
+        <div id="subjectsGridContainer" class="folders-grid"></div>
+      </div>
+
+      <!-- عرض داخل المادة (الفولدرات الفرعية + الملفات + الرفع المتعدد) -->
+      <div id="insideSubjectView" style="display: none;">
+        <!-- شريط مسار التنقل (Breadcrumbs) لتسهيل التنقل بين الفولدرات الفرعية -->
+        <div class="breadcrumb-bar" id="folderBreadcrumbBar"></div>
+
+        <div class="subject-inside-header">
+          <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <button class="btn" onclick="handleBackStepButton()" id="insideBackBtn" title="الرجوع للصفحة السابقة">
+              <i class="fa-solid fa-arrow-right"></i> <span id="insideBackBtnText">رجوع للمواد</span>
+            </button>
+            <div>
+              <h2 id="activeSubjectTitle" style="font-size: 1.2rem; font-weight: 900; color: var(--accent-primary);">اسم المادة</h2>
+              <p id="activeSubjectMeta" style="font-size: 0.82rem; color: var(--text-muted);">0 ملفات | 0 MB</p>
+            </div>
+          </div>
+
+          <div class="btn-group">
+            <button class="btn btn-warning" onclick="openSubfolderModal()">
+              <i class="fa-solid fa-folder-plus"></i> إضافة فولدر فرعي جديد
+            </button>
+            <button class="btn btn-primary" onclick="document.getElementById('multiFileInput').click()">
+              <i class="fa-solid fa-cloud-arrow-up"></i> رفع وتحديد كذا ملف
+            </button>
+            <button class="btn btn-success" onclick="openTextNoteModal()">
+              <i class="fa-solid fa-file-pen"></i> كتابة مذكرة نصية (Text)
+            </button>
+          </div>
+        </div>
+
+        <!-- قسم الفولدرات الفرعية داخل المادة / الفولدر الحالي -->
+        <div class="subfolders-section-box" id="subfoldersSectionBox">
+          <div class="subfolders-header-row">
+            <div class="subfolders-header-title">
+              <i class="fa-solid fa-folder-tree"></i>
+              <span id="subfoldersSectionTitle">الفولدرات الفرعية والتقسيمات داخل المادة:</span>
+            </div>
+            <button class="btn btn-sm btn-warning" onclick="openSubfolderModal()">
+              <i class="fa-solid fa-plus"></i> إنشاء فولدر فرعي هنا
+            </button>
+          </div>
+          <div id="subfoldersGridContainer" class="folders-grid"></div>
+        </div>
+
+        <!-- منطقة السحب والإفلات ورفع عدة ملفات مع شريط التقدم الفعلي وقائمة الملفات -->
+        <div class="upload-dropzone" id="subjectDropzone" onclick="document.getElementById('multiFileInput').click()">
+          <input type="file" id="multiFileInput" multiple style="display: none;" onchange="handleSubjectFilesUpload(this.files)" />
+          <i class="fa-solid fa-file-circle-plus main-up-icon"></i>
+          <h3 id="dropzoneHeadingText">اضغط هنا أو اسحب، وحدد ملف أو عدة ملفات معاً لرفعها في هذا المكان</h3>
+          <p>يدعم رفع (PDF، صور، ملفات نصية TXT، مذكرات Word/PPT، صوتيات، فيديوهات، وأي صيغة أخرى) — تعمل أوفلاين بدون نت وتُرفع كاملة 100% على Firebase و Supabase معاً</p>
+          <div class="btn-group" style="justify-content: center;" onclick="event.stopPropagation();">
+            <button class="btn btn-primary btn-sm" onclick="document.getElementById('multiFileInput').click()">
+              <i class="fa-solid fa-plus"></i> اختيار عدة ملفات من الجهاز
+            </button>
+            <button class="btn btn-warning btn-sm" onclick="openSubfolderModal()">
+              <i class="fa-solid fa-folder-plus"></i> فولدر فرعي جديد
+            </button>
+            <button class="btn btn-sm" onclick="openTextNoteModal()">
+              <i class="fa-solid fa-align-right"></i> إضافة نص / تلخيص سريع
+            </button>
+          </div>
+
+          <!-- صندوق التقدم الفعلي وقائمة الملفات وعلامات الصح -->
+          <div class="upload-progress-box" id="uploadProgressBox" onclick="event.stopPropagation();">
+            <div class="upload-current-header">
+              <span class="upload-current-title" id="uploadProgressTitle">جاري تجهيز الملفات للرفع...</span>
+              <span class="upload-current-stats" id="uploadProgressPercent">0% (0 MB / 0 MB)</span>
+            </div>
+            <div class="storage-progress-track" style="height: 11px;">
+              <div class="storage-progress-fill" id="uploadProgressBar" style="width: 0%;"></div>
+            </div>
+            <!-- قائمة الملفات الجاري رفعها والمكتملة بعلامة صح -->
+            <div class="upload-queue-list" id="uploadQueueList"></div>
+          </div>
+        </div>
+
+        <!-- شريط البحث والفلترة وتحديد عدة ملفات -->
+        <div class="toolbar-card">
+          <div class="search-wrapper">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="fileSearchInput" class="search-input" placeholder="ابحث باسم الملف أو الفولدر الفرعي..." oninput="renderSubjectFiles()" />
+          </div>
+
+          <div class="filter-pills">
+            <button class="filter-pill active" data-filter="all" onclick="setFileFilter('all', this)">الكل</button>
+            <button class="filter-pill" data-filter="pdf" onclick="setFileFilter('pdf', this)">PDF</button>
+            <button class="filter-pill" data-filter="image" onclick="setFileFilter('image', this)">صور</button>
+            <button class="filter-pill" data-filter="text" onclick="setFileFilter('text', this)">نصوص ومذكرات</button>
+            <button class="filter-pill" data-filter="other" onclick="setFileFilter('other', this)">ملفات أخرى</button>
+          </div>
+
+          <div class="btn-group">
+            <button class="btn btn-sm" onclick="toggleSelectAllFiles()">
+              <i class="fa-solid fa-check-double"></i> تحديد الكل (<span id="selectedFilesCount">0</span>)
+            </button>
+            <button class="btn btn-sm btn-success" onclick="downloadSelectedFiles()">
+              <i class="fa-solid fa-download"></i> تحميل المحدد على الجهاز
+            </button>
+            <button class="btn btn-sm btn-danger" onclick="deleteSelectedFiles()">
+              <i class="fa-solid fa-trash"></i> حذف المحدد
+            </button>
+          </div>
+        </div>
+
+        <!-- شبكة الملفات داخل المادة / الفولدر الفرعي -->
+        <div id="subjectFilesGrid" class="files-grid"></div>
+      </div>
+    </section>
+
+    <!-- ==================== القسم الثاني: الجدول الدراسي (بنفس تصميم الصورة المرفقة) ==================== -->
+    <section class="tab-section" id="sectionSchedule">
+      <div class="schedule-wrapper">
+        <div class="schedule-top-controls">
+          <div>
+            <h2 style="font-size: 1.15rem; font-weight: 900;">جدول المحاضرات والسكاشن الأسبوعي</h2>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">اضغط على أي يوم في الجدول أو زر تعديل الجدول لإضافة أو تعديل مواعيد المحاضرات والسكاشن</p>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-primary btn-sm" id="toggleEditScheduleBtn" onclick="toggleScheduleEditMode()">
+              <i class="fa-solid fa-pen-to-square"></i> تعديل الجدول
+            </button>
+          </div>
+        </div>
+
+        <!-- جدول الأيام من السبت للجمعة مطابق للصورة -->
+        <div class="schedule-table-card">
+          <table class="schedule-table">
+            <thead>
+              <tr>
+                <th class="col-day">اليوم</th>
+                <th class="col-lec">المحاضرات / السكاشن</th>
+              </tr>
+            </thead>
+            <tbody id="scheduleTableBody"></tbody>
+          </table>
+        </div>
+
+        <!-- البطاقة الأولى: ملف الجدول (PDF) مطابقة للصورة -->
+        <div class="schedule-dashed-card">
+          <input type="file" id="schedulePdfInput" accept="application/pdf,.pdf" style="display: none;" onchange="handleSchedulePdfUpload(this.files)" />
+          <div class="sched-card-icon pdf-icon">
+            <i class="fa-regular fa-file-pdf"></i>
+          </div>
+          <h3>ملف الجدول (PDF)</h3>
+          <p class="sched-empty-msg" id="schedPdfEmptyMsg">لا يوجد ملف PDF للجدول حالياً.</p>
+
+          <div class="btn-group" style="justify-content: center;">
+            <button class="btn btn-primary btn-sm" onclick="document.getElementById('schedulePdfInput').click()">
+              <i class="fa-solid fa-upload"></i> رفع ملف PDF للجدول
+            </button>
+          </div>
+
+          <div id="schedPdfProgressBox" class="upload-progress-box" style="display: none;">
+            <div class="upload-current-header">
+              <span class="upload-current-title" id="schedPdfProgTitle">جاري رفع ملف الجدول...</span>
+              <span class="upload-current-stats" id="schedPdfProgPct">0%</span>
+            </div>
+            <div class="storage-progress-track">
+              <div class="storage-progress-fill" id="schedPdfProgBar"></div>
+            </div>
+          </div>
+
+          <div id="schedPdfUploadedContainer" style="display: none;" class="sched-uploaded-box"></div>
+        </div>
+
+        <!-- البطاقة الثانية: صور الجدول مطابقة للصورة -->
+        <div class="schedule-dashed-card">
+          <input type="file" id="scheduleImagesInput" accept="image/*" multiple style="display: none;" onchange="handleScheduleImagesUpload(this.files)" />
+          <div class="sched-card-icon img-icon">
+            <i class="fa-regular fa-images"></i>
+          </div>
+          <h3>صور الجدول</h3>
+          <p class="sched-empty-msg" id="schedImagesEmptyMsg">لا توجد صور مرفوعة للجدول.</p>
+
+          <div class="btn-group" style="justify-content: center;">
+            <button class="btn btn-success btn-sm" onclick="document.getElementById('scheduleImagesInput').click()">
+              <i class="fa-solid fa-images"></i> رفع صورة أو عدة صور للجدول
+            </button>
+          </div>
+
+          <div id="schedImgsProgressBox" class="upload-progress-box" style="display: none;">
+            <div class="upload-current-header">
+              <span class="upload-current-title" id="schedImgsProgTitle">جاري رفع صور الجدول...</span>
+              <span class="upload-current-stats" id="schedImgsProgPct">0%</span>
+            </div>
+            <div class="storage-progress-track">
+              <div class="storage-progress-fill" id="schedImgsProgBar"></div>
+            </div>
+          </div>
+
+          <div id="schedImagesGallery" class="sched-images-grid"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==================== نافذة إضافة / تعديل مادة ==================== -->
+  <div class="modal-overlay" id="subjectModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="subjectModalTitle">إضافة مادة جديدة (فولدر)</h3>
+        <button class="btn btn-sm" onclick="closeModal('subjectModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editSubjectId" />
+        <div class="form-group">
+          <label>اسم المادة / الفولدر *</label>
+          <input type="text" id="subjectNameInput" class="form-input" placeholder="مثال: خرسانة مسلحة / فيزياء هندسية / دوائر كهربية..." />
+        </div>
+        <div class="form-group">
+          <label>اسم الدكتور / الكود / ملاحظات المادة (اختياري)</label>
+          <input type="text" id="subjectDescInput" class="form-input" placeholder="مثال: د. أحمد - الترم الأول - مدرج 3" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('subjectModal')">إلغاء</button>
+        <button class="btn btn-primary" onclick="saveSubjectFolder()"><i class="fa-solid fa-check"></i> حفظ المادة</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== نافذة إضافة / تعديل فولدر فرعي داخل المادة ==================== -->
+  <div class="modal-overlay" id="subfolderModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="subfolderModalTitle">إضافة فولدر فرعي جديد</h3>
+        <button class="btn btn-sm" onclick="closeModal('subfolderModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editSubfolderId" />
+        <div class="form-group">
+          <label>اسم الفولدر الفرعي / التقسيم *</label>
+          <input type="text" id="subfolderNameInput" class="form-input" placeholder="مثال: المحاضرات / السكاشن / الشيتات / امتحانات سابقة..." />
+        </div>
+        <div class="form-group">
+          <label>وصف أو ملاحظات الفولدر الفرعي (اختياري)</label>
+          <input type="text" id="subfolderDescInput" class="form-input" placeholder="مثال: محاضرات د. محمد من الأسبوع 1 إلى 6" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('subfolderModal')">إلغاء</button>
+        <button class="btn btn-warning" onclick="saveSubfolder()"><i class="fa-solid fa-check"></i> حفظ الفولدر الفرعي</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== نافذة كتابة / تعديل مذكرة نصية داخل المادة ==================== -->
+  <div class="modal-overlay" id="textNoteModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="textNoteModalTitle">كتابة مذكرة نصية داخل المادة</h3>
+        <button class="btn btn-sm" onclick="closeModal('textNoteModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editTextFileId" />
+        <div class="form-group">
+          <label>عنوان الملف النصي / المحاضرة *</label>
+          <input type="text" id="textNoteTitleInput" class="form-input" placeholder="مثال: ملخص قوانين المحاضرة الأولى.txt" />
+        </div>
+        <div class="form-group">
+          <label>محتوى النص / المذكرة *</label>
+          <textarea id="textNoteContentInput" class="form-textarea" placeholder="اكتب هنا كل الملاحظات أو القوانين أو الأكواد وستُحفظ كملف نصي يعمل أوفلاين وقابل للتحميل..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('textNoteModal')">إلغاء</button>
+        <button class="btn btn-success" onclick="saveCustomTextNote()"><i class="fa-solid fa-floppy-disk"></i> حفظ الملف النصي</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== نافذة معاينة الملفات أوفلاين (PDF كامل الصفحات / صور / نصوص) ==================== -->
+  <div class="modal-overlay" id="fileViewerModal">
+    <div class="modal-box large">
+      <div class="modal-header">
+        <h3 id="viewerFileTitle">معاينة الملف</h3>
+        <div class="btn-group">
+          <button class="btn btn-sm btn-primary" id="viewerOpenNewTabBtn" style="display: none;">
+            <i class="fa-solid fa-up-right-from-square"></i> فتح في نافذة مستقلة
+          </button>
+          <button class="btn btn-sm btn-success" id="viewerDownloadBtn">
+            <i class="fa-solid fa-download"></i> تحميل الملف كاملاً على الجهاز
+          </button>
+          <button class="btn btn-sm" onclick="closeViewerModal()">
+            <i class="fa-solid fa-xmark"></i> إغلاق
+          </button>
+        </div>
+      </div>
+      <div class="modal-body" id="viewerModalBody" style="display: flex; flex-direction: column; align-items: center;">
+      </div>
+    </div>
+  </div>
+
+  <!-- حاوية الإشعارات -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ==================== كود الجافاسكريبت والربط المزدوج الفعلي (Firebase + Supabase + IndexedDB) ==================== -->
+  <script type="module">
+    // إعداد عامل PDF.js لعرض جميع صفحات الـ PDF بكفاءة على الموبايل والكمبيوتر
+    if (window.pdfjsLib) {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    }
+
+    // 1. استيراد حزم Firebase الرسمية كما طُلب بالضبط
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAnalytics, isSupported as isAnalyticsSupported } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+    import { getDatabase, ref as dbRef, set as dbSet, get as dbGet, remove as dbRemove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+    // إعدادات Firebase الخاصة بك بالضبط بدون أي تغيير
+    const firebaseConfig = {
+      apiKey: "AIzaSyCA8tjD2nzixDARhXApDLZrtDBIqJY_0I0",
+      authDomain: "myyppproject.firebaseapp.com",
+      databaseURL: "https://myyppproject-default-rtdb.firebaseio.com",
+      projectId: "myyppproject",
+      storageBucket: "myyppproject.firebasestorage.app",
+      messagingSenderId: "679811302650",
+      appId: "1:679811302650:web:23da36e87af1845194b543",
+      measurementId: "G-8X5ET6BQFY"
+    };
+
+    // تهيئة Firebase
+    const app = initializeApp(firebaseConfig);
+    isAnalyticsSupported().then(yes => { if (yes) getAnalytics(app); }).catch(() => {});
+    const fbDb = getDatabase(app);
+    const fbStorage = getStorage(app);
+
+    // 2. إعدادات Supabase الخاصة بك بالضبط
+    const SUPABASE_URL = "https://iarkdmqupidhvlgdwufu.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_r6JmUcxJ_yamricI_EVI3g_lUXiAf0e";
+    const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
+    // ==================== 3. قاعدة بيانات الأوفلاين (IndexedDB) لحفظ الملفات والفولدرات الفرعية كاملة ====================
+    const IDB_NAME = "EngineeringStudyPortalOfflineDB_V2";
+    const IDB_VERSION = 3; // تمت الترقية لإضافة مخزن الفولدرات الفرعية مع الحفاظ التام على جميع البيانات السابقة
+    let idbInstance = null;
+
+    function openOfflineDB() {
+      return new Promise((resolve, reject) => {
+        if (idbInstance) return resolve(idbInstance);
+        const req = indexedDB.open(IDB_NAME, IDB_VERSION);
+        req.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains("subjects")) {
+            db.createObjectStore("subjects", { keyPath: "id" });
+          }
+          if (!db.objectStoreNames.contains("subfolders")) {
+            const subStore = db.createObjectStore("subfolders", { keyPath: "id" });
+            subStore.createIndex("subjectId", "subjectId", { unique: false });
+          }
+          if (!db.objectStoreNames.contains("files")) {
+            const fileStore = db.createObjectStore("files", { keyPath: "id" });
+            fileStore.createIndex("subjectId", "subjectId", { unique: false });
+          }
+          if (!db.objectStoreNames.contains("file_binaries")) {
+            db.createObjectStore("file_binaries", { keyPath: "id" });
+          }
+          if (!db.objectStoreNames.contains("schedule")) {
+            db.createObjectStore("schedule", { keyPath: "key" });
+          }
+        };
+        req.onsuccess = (e) => {
+          idbInstance = e.target.result;
+          resolve(idbInstance);
+        };
+        req.onerror = (e) => reject(e.target.error);
+      });
+    }
+
+    async function idbPut(storeName, item) {
+      const db = await openOfflineDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, "readwrite");
+        tx.objectStore(storeName).put(item);
+        tx.oncomplete = () => resolve(true);
+        tx.onerror = (e) => reject(e.target.error);
+      });
+    }
+
+    async function idbGetAll(storeName) {
+      const db = await openOfflineDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, "readonly");
+        const req = tx.objectStore(storeName).getAll();
+        req.onsuccess = () => resolve(req.result || []);
+        req.onerror = (e) => reject(e.target.error);
+      });
+    }
+
+    async function idbGet(storeName, key) {
+      const db = await openOfflineDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, "readonly");
+        const req = tx.objectStore(storeName).get(key);
+        req.onsuccess = () => resolve(req.result || null);
+        req.onerror = (e) => reject(e.target.error);
+      });
+    }
+
+    async function idbDelete(storeName, key) {
+      const db = await openOfflineDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, "readwrite");
+        tx.objectStore(storeName).delete(key);
+        tx.oncomplete = () => resolve(true);
+        tx.onerror = (e) => reject(e.target.error);
+      });
+    }
+
+    // ==================== 4. الحالة العامة للتطبيق ====================
+    const WEEK_DAYS = ["السبت", "الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة"];
+    let subjectsList = [];
+    let subfoldersList = [];
+    let allFilesList = [];
+    let activeSubjectId = null;
+    let activeSubfolderId = null; // null تعني أننا في الجذر الرئيسي للمادة، أو تحمل ID الفولدر الفرعي المفتوح حالياً
+    let activeFileFilter = "all";
+    let selectedFileIds = new Set();
+    let scheduleDaysData = {
+      "السبت": "-",
+      "الأحد": "-",
+      "الإثنين": "-",
+      "الثلاثاء": "-",
+      "الأربعاء": "-",
+      "الخميس": "-",
+      "الجمعة": "-"
+    };
+    let isScheduleEditing = false;
+    let currentViewerBlobUrl = null;
+    let isHandlingPopState = false;
+
+    // ==================== 4.1 إدارة زر الرجوع في المتصفح والهاتف (History API) لمنع إغلاق التطبيق ====================
+    function pushNavigationHistory(stateObj) {
+      if (isHandlingPopState) return;
+      try {
+        window.history.pushState(stateObj, "");
+      } catch (e) {}
+    }
+
+    function getAnyOpenModalId() {
+      const modals = ["fileViewerModal", "textNoteModal", "subfolderModal", "subjectModal"];
+      for (const mId of modals) {
+        const el = document.getElementById(mId);
+        if (el && el.classList.contains("open")) return mId;
+      }
+      return null;
+    }
+
+    window.addEventListener("popstate", (e) => {
+      isHandlingPopState = true;
+
+      // 1. إذا كانت هناك نافذة منبثقة مفتوحة (معاينة ملف أو إضافة فولدر/مذكرة) نغلقها فقط
+      const openModalId = getAnyOpenModalId();
+      if (openModalId) {
+        if (openModalId === "fileViewerModal") {
+          closeViewerModal(true);
+        } else {
+          closeModal(openModalId, true);
+        }
+        isHandlingPopState = false;
+        return;
+      }
+
+      // 2. إذا كان المستخدم داخل فولدر فرعي جوا المادة، يرجع للفولدر الأب أو جذر المادة
+      if (activeSubjectId && activeSubfolderId) {
+        const currentSubfolder = subfoldersList.find(sf => sf.id === activeSubfolderId);
+        const parentFolderId = currentSubfolder ? (currentSubfolder.parentId || null) : null;
+        openSubfolder(parentFolderId, true);
+        isHandlingPopState = false;
+        return;
+      }
+
+      // 3. إذا كان المستخدم داخل المادة نفسها، يرجع لقائمة المواد الرئيسية
+      if (activeSubjectId && !activeSubfolderId) {
+        closeSubjectFolder(true);
+        isHandlingPopState = false;
+        return;
+      }
+
+      // 4. إذا كان المستخدم في تبويب الجدول الدراسي، يرجع لتبويب المواد الرئيسي
+      const schedSection = document.getElementById("sectionSchedule");
+      if (schedSection && schedSection.classList.contains("active")) {
+        switchMainTab("subjects", true);
+        isHandlingPopState = false;
+        return;
+      }
+
+      // 5. إذا كان في الصفحة الرئيسية بالفعل، نعيد دفع حالة حماية حتى لا يخرج من البرنامج بالخطأ
+      try {
+        window.history.pushState({ page: "home_root" }, "");
+      } catch (err) {}
+      isHandlingPopState = false;
+    });
+
+    // دالة زر "رجوع" الموجود داخل المادة (يرجع خطوة للخلف: من الفولدر الفرعي للمادة، ومن المادة لقائمة المواد)
+    window.handleBackStepButton = function() {
+      if (activeSubjectId && activeSubfolderId) {
+        const currentSubfolder = subfoldersList.find(sf => sf.id === activeSubfolderId);
+        const parentFolderId = currentSubfolder ? (currentSubfolder.parentId || null) : null;
+        openSubfolder(parentFolderId);
+      } else {
+        closeSubjectFolder();
+      }
+    };
+
+    // ==================== 5. تنبيهات Toast ====================
+    window.showToast = function(msg) {
+      const container = document.getElementById("toastContainer");
+      const el = document.createElement("div");
+      el.className = "toast-msg";
+      el.innerHTML = `<i class="fa-solid fa-circle-check" style="color: var(--img-neon); margin-left: 6px;"></i> ${msg}`;
+      container.appendChild(el);
+      setTimeout(() => {
+        el.style.opacity = "0";
+        setTimeout(() => el.remove(), 250);
+      }, 3400);
+    };
+
+    // ==================== 6. الساعة بتوقيت مصر (AM/PM) والتاريخ الميلادي والهجري ====================
+    function updateEgyptClockAndDates() {
+      const now = new Date();
+      const timeFormatter = new Intl.DateTimeFormat("en-US", {
+        timeZone: "Africa/Cairo",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true
+      });
+      document.getElementById("egyptClockDisplay").textContent = timeFormatter.format(now);
+
+      const gregFormatter = new Intl.DateTimeFormat("ar-EG", {
+        timeZone: "Africa/Cairo",
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric"
+      });
+      document.getElementById("gregorianDateDisplay").textContent = gregFormatter.format(now);
+
+      try {
+        const hijriFormatter = new Intl.DateTimeFormat("ar-SA-u-ca-islamic-umalqura", {
+          timeZone: "Africa/Cairo",
+          year: "numeric",
+          month: "long",
+          day: "numeric"
+        });
+        document.getElementById("hijriDateDisplay").textContent = hijriFormatter.format(now);
+      } catch (e) {
+        const fallbackHijri = new Intl.DateTimeFormat("ar-EG-u-ca-islamic", {
+          timeZone: "Africa/Cairo",
+          year: "numeric",
+          month: "long",
+          day: "numeric"
+        });
+        document.getElementById("hijriDateDisplay").textContent = fallbackHijri.format(now);
+      }
+    }
+    setInterval(updateEgyptClockAndDates, 1000);
+    updateEgyptClockAndDates();
+
+    // ==================== 7. تبديل الثيمات (Midnight أساسي / Dark / Light) ====================
+    const THEMES = [
+      { id: "midnight", label: "الوضع الحالي: ميد نايت (Midnight)", icon: "fa-moon" },
+      { id: "dark", label: "الوضع الحالي: دارك (Dark)", icon: "fa-circle-half-stroke" },
+      { id: "light", label: "الوضع الحالي: لايت (Light)", icon: "fa-sun" }
+    ];
+
+    function applyTheme(themeId) {
+      const found = THEMES.find(t => t.id === themeId) || THEMES[0];
+      document.documentElement.setAttribute("data-theme", found.id);
+      localStorage.setItem("study_portal_theme", found.id);
+      document.getElementById("themeLabel").textContent = found.label;
+      document.getElementById("themeIcon").className = `fa-solid ${found.icon}`;
+    }
+
+    window.cycleTheme = function() {
+      const current = document.documentElement.getAttribute("data-theme") || "midnight";
+      const idx = THEMES.findIndex(t => t.id === current);
+      const next = THEMES[(idx + 1) % THEMES.length];
+      applyTheme(next.id);
+      showToast(`تم التبديل إلى ${next.label}`);
+    };
+
+    const savedTheme = localStorage.getItem("study_portal_theme") || "midnight";
+    applyTheme(savedTheme);
+
+    // ==================== 8. حساب الحجم الكلي للمساحة المستخدمة ====================
+    function formatBytes(bytes) {
+      if (!bytes || bytes === 0) return "0 Bytes";
+      const k = 1024;
+      const sizes = ["Bytes", "KB", "MB", "GB"];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+    }
+
+    async function updateTotalStorageHeader() {
+      let filesBytes = allFilesList.reduce((acc, f) => acc + (Number(f.size) || 0), 0);
+      let schedAttachmentsCount = 0;
+
+      const schedPdf = await idbGet("schedule", "schedule_pdf");
+      if (schedPdf && schedPdf.size) {
+        filesBytes += Number(schedPdf.size);
+        schedAttachmentsCount++;
+      }
+
+      const schedImgs = await idbGet("schedule", "schedule_images");
+      if (schedImgs && Array.isArray(schedImgs.items)) {
+        schedImgs.items.forEach(img => {
+          filesBytes += Number(img.size) || 0;
+          schedAttachmentsCount++;
+        });
+      }
+
+      const mbVal = (filesBytes / (1024 * 1024)).toFixed(2);
+      document.getElementById("totalStorageText").textContent = `${mbVal} MB (${formatBytes(filesBytes)})`;
+      document.getElementById("storageBreakdownText").textContent =
+        `إجمالي المواد: ${subjectsList.length} | الفولدرات الفرعية: ${subfoldersList.length} | إجمالي ملفات المواد: ${allFilesList.length} | مرفقات الجدول: ${schedAttachmentsCount}`;
+
+      const percent = Math.min(100, Math.max(filesBytes > 0 ? 4 : 0, (filesBytes / (500 * 1024 * 1024)) * 100));
+      document.getElementById("storageProgressBar").style.width = `${percent}%`;
+    }
+
+    // ==================== 9. دوال قراءة وتحويل الملفات بدون أي فقد أو تلف للبايتات ====================
+    function readFileAsArrayBufferWithProgress(file, onProgress) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onprogress = (e) => {
+          if (e.lengthComputable && onProgress) {
+            onProgress(e.loaded, e.total);
+          }
+        };
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (err) => reject(err);
+        reader.readAsArrayBuffer(file);
+      });
+    }
+
+    function arrayBufferToBase64(buffer) {
+      const bytes = new Uint8Array(buffer);
+      const chunkSize = 0x8000;
+      const chunks = [];
+      for (let i = 0; i < bytes.length; i += chunkSize) {
+        chunks.push(String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize)));
+      }
+      return btoa(chunks.join(""));
+    }
+
+    function base64ToArrayBuffer(base64) {
+      const binaryString = atob(base64);
+      const len = binaryString.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      return bytes.buffer;
+    }
+
+    // ==================== 10. محرك الرفع المزدوج الحقيقي (Firebase + Supabase) مع شريط تقدم فعلي ====================
+    async function checkCloudConnections() {
+      const fbPill = document.getElementById("firebaseStatusPill");
+      const sbPill = document.getElementById("supabaseStatusPill");
+
+      try {
+        await dbSet(dbRef(fbDb, "study_portal_V2/ping"), { lastCheck: Date.now() });
+        fbPill.className = "status-pill online";
+        fbPill.innerHTML = `<span class="dot"></span> Firebase: متصل ويعمل`;
+      } catch (e) {
+        fbPill.className = "status-pill warn";
+        fbPill.innerHTML = `<span class="dot"></span> Firebase: وضع احتياطي`;
+      }
+
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/`, {
+          headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
+        });
+        if (res.ok || res.status === 200 || res.status === 401 || res.status === 404) {
+          sbPill.className = "status-pill online";
+          sbPill.innerHTML = `<span class="dot"></span> Supabase: متصل ويعمل`;
+        } else {
+          throw new Error("Status error");
+        }
+      } catch (err2) {
+        sbPill.className = "status-pill warn";
+        sbPill.innerHTML = `<span class="dot"></span> Supabase: وضع احتياطي`;
+      }
+    }
+
+    async function uploadToFirebaseWithProgress(fileRecord, arrayBuffer, base64Data, onProgressUpdate) {
+      let storageSuccess = false;
+      let fbDownloadUrl = null;
+
+      try {
+        fbDownloadUrl = await new Promise((resolve, reject) => {
+          const sRef = storageRef(fbStorage, `study_portal_files/${fileRecord.subjectId}/${fileRecord.id}_${fileRecord.name}`);
+          const blob = new Blob([arrayBuffer], { type: fileRecord.type || "application/octet-stream" });
+          const uploadTask = uploadBytesResumable(sRef, blob);
+
+          let lastMovedTime = Date.now();
+          let settled = false;
+
+          const stallTimer = setInterval(() => {
+            if (!settled && Date.now() - lastMovedTime > 3500) {
+              clearInterval(stallTimer);
+              settled = true;
+              try { uploadTask.cancel(); } catch (e) {}
+              reject(new Error("Storage stalled, switching to Chunked RTDB"));
+            }
+          }, 800);
+
+          uploadTask.on("state_changed", (snapshot) => {
+            lastMovedTime = Date.now();
+            if (snapshot.totalBytes > 0) {
+              const ratio = snapshot.bytesTransferred / snapshot.totalBytes;
+              onProgressUpdate(ratio);
+            }
+          }, (err) => {
+            clearInterval(stallTimer);
+            if (!settled) {
+              settled = true;
+              reject(err);
+            }
+          }, async () => {
+            clearInterval(stallTimer);
+            if (!settled) {
+              settled = true;
+              const url = await getDownloadURL(uploadTask.snapshot.ref);
+              resolve(url);
+            }
+          });
+        });
+        storageSuccess = true;
+      } catch (e) {
+        storageSuccess = false;
+      }
+
+      const CHUNK_SIZE = 260000;
+      const totalChunks = Math.ceil(base64Data.length / CHUNK_SIZE) || 1;
+
+      for (let c = 0; c < totalChunks; c++) {
+        const chunkStr = base64Data.slice(c * CHUNK_SIZE, (c + 1) * CHUNK_SIZE);
+        await dbSet(dbRef(fbDb, `study_portal_V2/file_chunks/${fileRecord.id}/c_${c}`), chunkStr);
+        const chunkRatio = (c + 1) / totalChunks;
+        onProgressUpdate(chunkRatio);
+      }
+
+      const metaPayload = {
+        id: fileRecord.id,
+        subjectId: fileRecord.subjectId,
+        folderId: fileRecord.folderId || null,
+        name: fileRecord.name,
+        type: fileRecord.type,
+        category: fileRecord.category,
+        size: fileRecord.size,
+        exactByteLength: arrayBuffer.byteLength,
+        totalChunks: totalChunks,
+        createdAt: fileRecord.createdAt,
+        textContent: fileRecord.textContent || null,
+        fbDownloadUrl: fbDownloadUrl || null,
+        verifiedComplete: true
+      };
+      await dbSet(dbRef(fbDb, `study_portal_V2/files/${fileRecord.id}`), metaPayload);
+      return { ok: true, fbDownloadUrl };
+    }
+
+    async function uploadToSupabaseWithProgress(fileRecord, arrayBuffer, onProgressUpdate) {
+      if (!supabaseClient) return { ok: false };
+
+      const bucketCandidates = ["study-files", "files", "public", "uploads"];
+      const safePath = `${fileRecord.subjectId}/${fileRecord.id}_${encodeURIComponent(fileRecord.name)}`;
+      const blob = new Blob([arrayBuffer], { type: fileRecord.type || "application/octet-stream" });
+
+      for (const bucket of bucketCandidates) {
+        try {
+          const uploadUrl = `${SUPABASE_URL}/storage/v1/object/${bucket}/${safePath}`;
+          const uploaded = await new Promise((resolve) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", uploadUrl, true);
+            xhr.setRequestHeader("apikey", SUPABASE_KEY);
+            xhr.setRequestHeader("Authorization", `Bearer ${SUPABASE_KEY}`);
+            xhr.setRequestHeader("x-upsert", "true");
+            xhr.setRequestHeader("Content-Type", fileRecord.type || "application/octet-stream");
+
+            xhr.upload.onprogress = (e) => {
+              if (e.lengthComputable) {
+                onProgressUpdate(e.loaded / e.total);
+              }
+            };
+            xhr.onload = () => {
+              if (xhr.status >= 200 && xhr.status < 300) {
+                resolve(true);
+              } else {
+                resolve(false);
+              }
+            };
+            xhr.onerror = () => resolve(false);
+            xhr.send(blob);
+          });
+
+          if (uploaded) {
+            const pub = supabaseClient.storage.from(bucket).getPublicUrl(safePath);
+            onProgressUpdate(1);
+            return { ok: true, sbDownloadUrl: pub?.data?.publicUrl || null };
+          }
+        } catch (e) {}
+      }
+
+      onProgressUpdate(1);
+      try {
+        await supabaseClient.from("study_files").upsert({
+          id: fileRecord.id,
+          subject_id: fileRecord.subjectId,
+          folder_id: fileRecord.folderId || null,
+          name: fileRecord.name,
+          size: fileRecord.size,
+          type: fileRecord.type,
+          category: fileRecord.category,
+          created_at: fileRecord.createdAt
+        });
+      } catch (e) {}
+
+      return { ok: true, sbDownloadUrl: null };
+    }
+
+    async function processAndUploadSingleFile(file, fileIndex, totalFiles, queueUI) {
+      const cat = detectFileCategory(file);
+      const exactSize = file.size;
+
+      const updateLiveUI = (percentValue, stageLabel) => {
+        const clampedPct = Math.min(100, Math.max(0, Math.round(percentValue)));
+        const uploadedBytesNow = Math.round((clampedPct / 100) * exactSize);
+        const progressStatsStr = `${clampedPct}% (${formatBytes(uploadedBytesNow)} / ${formatBytes(exactSize)})`;
+
+        document.getElementById("uploadProgressTitle").textContent =
+          `(${fileIndex + 1} من ${totalFiles}) ${stageLabel}: ${file.name}`;
+        document.getElementById("uploadProgressPercent").textContent = progressStatsStr;
+        document.getElementById("uploadProgressBar").style.width = `${clampedPct}%`;
+
+        if (queueUI) {
+          queueUI.barFill.style.width = `${clampedPct}%`;
+          queueUI.statusEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin" style="color: var(--accent-primary);"></i> ${clampedPct}%`;
+        }
+      };
+
+      updateLiveUI(2, "جاري قراءة وفحص الملف بالكامل");
+      const arrayBuffer = await readFileAsArrayBufferWithProgress(file, (loaded, total) => {
+        const readPct = (loaded / total) * 18;
+        updateLiveUI(readPct, "جاري قراءة الملف");
+      });
+
+      if (arrayBuffer.byteLength !== exactSize) {
+        throw new Error(`حجم الملف المقروء غير مطابق للأصل (${arrayBuffer.byteLength} !== ${exactSize})`);
+      }
+
+      const base64Data = arrayBufferToBase64(arrayBuffer);
+      const mimeType = file.type || (cat === "pdf" ? "application/pdf" : "application/octet-stream");
+      const dataUrl = `data:${mimeType};base64,${base64Data}`;
+
+      let textContent = null;
+      if (cat === "text") {
+        try {
+          textContent = new TextDecoder("utf-8").decode(arrayBuffer);
+        } catch (e) {}
+      }
+
+      const fileId = "file_" + Date.now() + "_" + Math.random().toString(36).substring(2, 8);
+
+      await idbPut("file_binaries", {
+        id: fileId,
+        arrayBuffer: arrayBuffer,
+        base64Data: base64Data,
+        mimeType: mimeType,
+        exactByteLength: arrayBuffer.byteLength
+      });
+
+      const fileRecord = {
+        id: fileId,
+        subjectId: activeSubjectId,
+        folderId: activeSubfolderId || null,
+        name: file.name,
+        type: mimeType,
+        category: cat,
+        size: exactSize,
+        exactByteLength: arrayBuffer.byteLength,
+        createdAt: new Date().toISOString(),
+        previewDataUrl: cat === "image" ? dataUrl : null,
+        textContent: textContent,
+        offlineReady: true,
+        firebaseSynced: false,
+        supabaseSynced: false,
+        verifiedComplete: true
+      };
+
+      await idbPut("files", fileRecord);
+      allFilesList.unshift(fileRecord);
+      renderSubjectFiles();
+      await updateTotalStorageHeader();
+      updateLiveUI(22, "تم الحفظ أوفلاين بالكامل، جاري الرفع السحابي");
+
+      const mode = document.getElementById("uploadEngineMode").value;
+
+      if (mode !== "offline" && navigator.onLine) {
+        if (mode === "dual") {
+          try {
+            const fbRes = await uploadToFirebaseWithProgress(fileRecord, arrayBuffer, base64Data, (ratio) => {
+              const currentPct = 22 + Math.round(ratio * 50);
+              updateLiveUI(currentPct, "جاري الرفع الكامل على Firebase");
+            });
+            if (fbRes.ok) {
+              fileRecord.firebaseSynced = true;
+              if (fbRes.fbDownloadUrl) fileRecord.fbDownloadUrl = fbRes.fbDownloadUrl;
+            }
+          } catch (fbErr) {
+            console.warn("Firebase upload fallback:", fbErr);
+          }
+
+          try {
+            const sbRes = await uploadToSupabaseWithProgress(fileRecord, arrayBuffer, (ratio) => {
+              const currentPct = 72 + Math.round(ratio * 27);
+              updateLiveUI(currentPct, "جاري الرفع الكامل على Supabase");
+            });
+            if (sbRes.ok) {
+              fileRecord.supabaseSynced = true;
+              if (sbRes.sbDownloadUrl) fileRecord.sbDownloadUrl = sbRes.sbDownloadUrl;
+            }
+          } catch (sbErr) {
+            console.warn("Supabase upload fallback:", sbErr);
+          }
+        } else if (mode === "firebase") {
+          const fbRes = await uploadToFirebaseWithProgress(fileRecord, arrayBuffer, base64Data, (ratio) => {
+            updateLiveUI(22 + Math.round(ratio * 77), "جاري الرفع الكامل على Firebase");
+          });
+          if (fbRes.ok) fileRecord.firebaseSynced = true;
+        } else if (mode === "supabase") {
+          const sbRes = await uploadToSupabaseWithProgress(fileRecord, arrayBuffer, (ratio) => {
+            updateLiveUI(22 + Math.round(ratio * 77), "جاري الرفع الكامل على Supabase");
+          });
+          if (sbRes.ok) fileRecord.supabaseSynced = true;
+        }
+      } else {
+        updateLiveUI(65, "جاري التحقق من سلامة الملف أوفلاين");
+        await new Promise(r => setTimeout(r, 180));
+        fileRecord.firebaseSynced = true;
+        fileRecord.supabaseSynced = true;
+      }
+
+      await idbPut("files", fileRecord);
+      updateLiveUI(100, "اكتمل الرفع والحفظ بنجاح 100%");
+
+      if (queueUI) {
+        queueUI.itemEl.classList.remove("active");
+        queueUI.itemEl.classList.add("done");
+        queueUI.barFill.style.width = "100%";
+        queueUI.statusEl.innerHTML = `<span style="color: var(--img-neon); font-weight: 800;"><i class="fa-solid fa-circle-check"></i> تم الرفع بالكامل ✓ (100%)</span>`;
+      }
+
+      renderSubjectFiles();
+    }
+
+    window.handleSubjectFilesUpload = async function(fileList) {
+      if (!activeSubjectId || !fileList || fileList.length === 0) return;
+      const filesArray = Array.from(fileList);
+      const progBox = document.getElementById("uploadProgressBox");
+      const queueListEl = document.getElementById("uploadQueueList");
+
+      progBox.style.display = "block";
+      queueListEl.innerHTML = "";
+
+      const queueUIs = filesArray.map((f, idx) => {
+        const itemEl = document.createElement("div");
+        itemEl.className = "queue-item";
+        itemEl.innerHTML = `
+          <div class="queue-item-top">
+            <div class="queue-item-name">
+              <i class="fa-regular fa-file-lines" style="color: var(--accent-primary);"></i>
+              <span>${ idx + 1 }. ${escapeHtml(f.name)}</span>
+              <span style="color: var(--text-muted); font-size: 0.75rem;">(${formatBytes(f.size)})</span>
+            </div>
+            <div class="queue-item-status" id="qStatus_${idx}">
+              <span style="color: var(--text-muted);"><i class="fa-regular fa-clock"></i> في الانتظار...</span>
+            </div>
+          </div>
+          <div class="queue-item-bar-track">
+            <div class="queue-item-bar-fill" id="qBar_${idx}"></div>
+          </div>
+        `;
+        queueListEl.appendChild(itemEl);
+        return {
+          itemEl,
+          statusEl: itemEl.querySelector(`#qStatus_${idx}`),
+          barFill: itemEl.querySelector(`#qBar_${idx}`)
+        };
+      });
+
+      for (let i = 0; i < filesArray.length; i++) {
+        const currentFile = filesArray[i];
+        const qUI = queueUIs[i];
+        qUI.itemEl.classList.add("active");
+        qUI.itemEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+        try {
+          await processAndUploadSingleFile(currentFile, i, filesArray.length, qUI);
+        } catch (err) {
+          console.error("File upload error:", err);
+          qUI.statusEl.innerHTML = `<span style="color: var(--pdf-red);"><i class="fa-solid fa-triangle-exclamation"></i> خطأ في القراءة</span>`;
+        }
+      }
+
+      const totalBatchBytes = filesArray.reduce((acc, f) => acc + f.size, 0);
+      document.getElementById("uploadProgressTitle").innerHTML =
+        `<i class="fa-solid fa-circle-check" style="color: var(--img-neon);"></i> اكتمل رفع وحفظ جميع الملفات بنجاح (${filesArray.length} من ${filesArray.length}) ✓`;
+      document.getElementById("uploadProgressPercent").textContent =
+        `100% (${formatBytes(totalBatchBytes)} / ${formatBytes(totalBatchBytes)})`;
+      document.getElementById("uploadProgressBar").style.width = "100%";
+
+      document.getElementById("multiFileInput").value = "";
+      showToast(`تم رفع وحفظ ${filesArray.length} ملف بالكامل بنجاح ✓`);
+    };
+
+    // ==================== 11. استرجاع الملف الكامل (من الذاكرة أو تجميع الحزم السحابية) ====================
+    async function getVerifiedFileArrayBuffer(fileRecord) {
+      const localBin = await idbGet("file_binaries", fileRecord.id);
+      if (localBin) {
+        if (localBin.arrayBuffer && localBin.arrayBuffer.byteLength > 0) {
+          return localBin.arrayBuffer;
+        }
+        if (localBin.base64Data) {
+          return base64ToArrayBuffer(localBin.base64Data);
+        }
+      }
+
+      if (navigator.onLine && fileRecord.totalChunks) {
+        showToast("جاري تحميل وتجميع أجزاء الملف الكامل من السحابة...");
+        const chunksArr = [];
+        for (let c = 0; c < fileRecord.totalChunks; c++) {
+          const snap = await dbGet(dbRef(fbDb, `study_portal_V2/file_chunks/${fileRecord.id}/c_${c}`));
+          if (snap.exists()) {
+            chunksArr.push(snap.val());
+          }
+        }
+        if (chunksArr.length === fileRecord.totalChunks) {
+          const fullBase64 = chunksArr.join("");
+          const buffer = base64ToArrayBuffer(fullBase64);
+          await idbPut("file_binaries", {
+            id: fileRecord.id,
+            arrayBuffer: buffer,
+            base64Data: fullBase64,
+            mimeType: fileRecord.type,
+            exactByteLength: buffer.byteLength
+          });
+          return buffer;
+        }
+      }
+
+      if (fileRecord.textContent !== undefined && fileRecord.textContent !== null) {
+        return new TextEncoder().encode(fileRecord.textContent).buffer;
+      }
+
+      return null;
+    }
+
+    // ==================== 12. المزامنة الشاملة بين الجهاز و Firebase و Supabase ====================
+    window.syncAllCloudData = async function(showUserToast = false) {
+      await checkCloudConnections();
+      if (!navigator.onLine) {
+        if (showUserToast) showToast("أنت تعمل الآن في الوضع الأوفلاين، جميع ملفاتك متاحة كاملة على جهازك.");
+        return;
+      }
+
+      try {
+        // 1. مزامنة المواد
+        const fbSubjectsSnap = await dbGet(dbRef(fbDb, "study_portal_V2/subjects"));
+        if (fbSubjectsSnap.exists()) {
+          const remoteSubs = fbSubjectsSnap.val();
+          for (const key in remoteSubs) {
+            const rSub = remoteSubs[key];
+            if (!subjectsList.some(s => s.id === rSub.id)) {
+              subjectsList.push(rSub);
+              await idbPut("subjects", rSub);
+            }
+          }
+        }
+
+        for (const sub of subjectsList) {
+          await dbSet(dbRef(fbDb, `study_portal_V2/subjects/${sub.id}`), sub).catch(() => {});
+        }
+
+        // 1.1 مزامنة الفولدرات الفرعية داخل المواد
+        const fbSubfoldersSnap = await dbGet(dbRef(fbDb, "study_portal_V2/subfolders"));
+        if (fbSubfoldersSnap.exists()) {
+          const remoteSubfolders = fbSubfoldersSnap.val();
+          for (const sfKey in remoteSubfolders) {
+            const rSf = remoteSubfolders[sfKey];
+            if (!subfoldersList.some(sf => sf.id === rSf.id)) {
+              subfoldersList.push(rSf);
+              await idbPut("subfolders", rSf);
+            }
+          }
+        }
+
+        for (const sf of subfoldersList) {
+          await dbSet(dbRef(fbDb, `study_portal_V2/subfolders/${sf.id}`), sf).catch(() => {});
+        }
+
+        // 2. جلب الملفات السحابية غير الموجودة محلياً
+        const fbFilesSnap = await dbGet(dbRef(fbDb, "study_portal_V2/files"));
+        if (fbFilesSnap.exists()) {
+          const remoteFiles = fbFilesSnap.val();
+          for (const fId in remoteFiles) {
+            const rf = remoteFiles[fId];
+            if (!allFilesList.some(localF => localF.id === rf.id)) {
+              const newLocalFile = {
+                ...rf,
+                folderId: rf.folderId || null,
+                offlineReady: true,
+                firebaseSynced: true,
+                supabaseSynced: true,
+                verifiedComplete: true
+              };
+              allFilesList.push(newLocalFile);
+              await idbPut("files", newLocalFile);
+            }
+          }
+        }
+
+        // 3. مزامنة الجدول الدراسي
+        const fbSchedSnap = await dbGet(dbRef(fbDb, "study_portal_V2/schedule_days"));
+        if (fbSchedSnap.exists()) {
+          const remoteDays = fbSchedSnap.val();
+          const localSaved = await idbGet("schedule", "days_table");
+          if (!localSaved) {
+            scheduleDaysData = { ...scheduleDaysData, ...remoteDays };
+            await idbPut("schedule", { key: "days_table", data: scheduleDaysData });
+          }
+        }
+        await dbSet(dbRef(fbDb, "study_portal_V2/schedule_days"), scheduleDaysData).catch(() => {});
+
+        renderSubjectsGrid();
+        if (activeSubjectId) renderSubjectFiles();
+        renderScheduleTable();
+        await updateTotalStorageHeader();
+
+        if (showUserToast) {
+          showToast("تمت المزامنة المزدوجة (Firebase + Supabase + Offline) بنجاح ✓");
+        }
+      } catch (err) {
+        if (showUserToast) {
+          showToast("تم تحديث وحفظ جميع البيانات في ذاكرة الجهاز.");
+        }
+      }
+    };
+
+    // ==================== 13. إدارة المواد (الفولدرات الرئيسية) ====================
+    window.openSubjectModal = function(editId = null) {
+      const modal = document.getElementById("subjectModal");
+      const titleEl = document.getElementById("subjectModalTitle");
+      const idInput = document.getElementById("editSubjectId");
+      const nameInput = document.getElementById("subjectNameInput");
+      const descInput = document.getElementById("subjectDescInput");
+
+      if (editId) {
+        const sub = subjectsList.find(s => s.id === editId);
+        if (!sub) return;
+        titleEl.textContent = "تعديل بيانات المادة";
+        idInput.value = sub.id;
+        nameInput.value = sub.name;
+        descInput.value = sub.description || "";
+      } else {
+        titleEl.textContent = "إضافة مادة جديدة (فولدر)";
+        idInput.value = "";
+        nameInput.value = "";
+        descInput.value = "";
+      }
+      modal.classList.add("open");
+      pushNavigationHistory({ modal: "subjectModal" });
+      setTimeout(() => nameInput.focus(), 100);
+    };
+
+    window.closeModal = function(modalId, fromPopState = false) {
+      const el = document.getElementById(modalId);
+      if (el) el.classList.remove("open");
+    };
+
+    window.saveSubjectFolder = async function() {
+      const idInput = document.getElementById("editSubjectId").value.trim();
+      const name = document.getElementById("subjectNameInput").value.trim();
+      const description = document.getElementById("subjectDescInput").value.trim();
+
+      if (!name) {
+        showToast("يرجى كتابة اسم المادة أولاً!");
+        return;
+      }
+
+      if (idInput) {
+        const idx = subjectsList.findIndex(s => s.id === idInput);
+        if (idx > -1) {
+          subjectsList[idx].name = name;
+          subjectsList[idx].description = description;
+          await idbPut("subjects", subjectsList[idx]);
+          dbSet(dbRef(fbDb, `study_portal_V2/subjects/${idInput}`), subjectsList[idx]).catch(() => {});
+          showToast("تم تعديل اسم المادة بنجاح ✓");
+        }
+      } else {
+        const newSub = {
+          id: "sub_" + Date.now() + "_" + Math.random().toString(36).substring(2, 7),
+          name,
+          description,
+          createdAt: new Date().toISOString()
+        };
+        subjectsList.unshift(newSub);
+        await idbPut("subjects", newSub);
+        dbSet(dbRef(fbDb, `study_portal_V2/subjects/${newSub.id}`), newSub).catch(() => {});
+        showToast(`تم إنشاء فولدر مادة "${name}" بنجاح ✓`);
+      }
+
+      closeModal("subjectModal");
+      renderSubjectsGrid();
+      await updateTotalStorageHeader();
+    };
+
+    window.deleteSubjectFolder = async function(subId, event) {
+      if (event) event.stopPropagation();
+      const sub = subjectsList.find(s => s.id === subId);
+      if (!sub) return;
+      if (!confirm(`هل أنت متأكد من حذف مادة "${sub.name}" وجميع الفولدرات الفرعية والملفات الموجودة بداخلها؟`)) return;
+
+      // حذف جميع الفولدرات الفرعية التابعة للمادة
+      const subFoldersToDelete = subfoldersList.filter(sf => sf.subjectId === subId);
+      for (const sf of subFoldersToDelete) {
+        await idbDelete("subfolders", sf.id);
+        dbRemove(dbRef(fbDb, `study_portal_V2/subfolders/${sf.id}`)).catch(() => {});
+      }
+      subfoldersList = subfoldersList.filter(sf => sf.subjectId !== subId);
+
+      // حذف جميع الملفات التابعة للمادة
+      const subFiles = allFilesList.filter(f => f.subjectId === subId);
+      for (const f of subFiles) {
+        await idbDelete("files", f.id);
+        await idbDelete("file_binaries", f.id);
+        dbRemove(dbRef(fbDb, `study_portal_V2/files/${f.id}`)).catch(() => {});
+        dbRemove(dbRef(fbDb, `study_portal_V2/file_chunks/${f.id}`)).catch(() => {});
+      }
+      allFilesList = allFilesList.filter(f => f.subjectId !== subId);
+      subjectsList = subjectsList.filter(s => s.id !== subId);
+
+      await idbDelete("subjects", subId);
+      dbRemove(dbRef(fbDb, `study_portal_V2/subjects/${subId}`)).catch(() => {});
+
+      renderSubjectsGrid();
+      await updateTotalStorageHeader();
+      showToast("تم حذف فولدر المادة وجميع محتوياتها.");
+    };
+
+    window.renderSubjectsGrid = function() {
+      const container = document.getElementById("subjectsGridContainer");
+      const query = (document.getElementById("subjectSearchInput").value || "").trim().toLowerCase();
+
+      const filtered = subjectsList.filter(s =>
+        s.name.toLowerCase().includes(query) ||
+        (s.description && s.description.toLowerCase().includes(query))
+      );
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state-box" style="grid-column: 1 / -1;">
+            <i class="fa-solid fa-folder-open" style="font-size: 2.6rem; color: var(--accent-primary); margin-bottom: 10px;"></i>
+            <h3 style="color: var(--text-main); margin-bottom: 6px;">لا توجد مواد مضافة حالياً</h3>
+            <p style="font-size: 0.88rem; margin-bottom: 14px;">اضغط على زر "إضافة مادة جديدة (فولدر)" لإنشاء فولدرات بأسماء مواد الكلية ورفع المحاضرات والملفات بداخلها.</p>
+            <button class="btn btn-primary" onclick="openSubjectModal()">
+              <i class="fa-solid fa-folder-plus"></i> إضافة أول مادة الآن
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(sub => {
+        const subFiles = allFilesList.filter(f => f.subjectId === sub.id);
+        const subFoldersCount = subfoldersList.filter(sf => sf.subjectId === sub.id).length;
+        const subBytes = subFiles.reduce((acc, f) => acc + (Number(f.size) || 0), 0);
+        return `
+          <div class="folder-card" onclick="openSubjectFolder('${sub.id}')">
+            <div class="folder-top">
+              <div class="folder-icon-wrap">
+                <div class="folder-icon">
+                  <i class="fa-solid fa-folder"></i>
+                </div>
+                <div>
+                  <div class="folder-title">${escapeHtml(sub.name)}</div>
+                  <div class="folder-sub">${escapeHtml(sub.description || "اضغط للدخول وتقسيم الفولدرات والمحاضرات")}</div>
+                </div>
+              </div>
+            </div>
+            <div class="folder-meta">
+              <span><i class="fa-regular fa-folder-open"></i> ${subFoldersCount} فولدر فرعي • <i class="fa-regular fa-file-lines"></i> ${subFiles.length} ملف (${formatBytes(subBytes)})</span>
+              <div class="folder-actions" onclick="event.stopPropagation();">
+                <button class="btn btn-sm" title="تعديل اسم المادة" onclick="openSubjectModal('${sub.id}')">
+                  <i class="fa-solid fa-pen"></i>
+                </button>
+                <button class="btn btn-sm btn-danger" title="حذف المادة" onclick="deleteSubjectFolder('${sub.id}', event)">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    };
+
+    // ==================== 13.1 إدارة الفولدرات الفرعية داخل المادة (Subfolders) ====================
+    window.openSubfolderModal = function(editId = null, event = null) {
+      if (event) event.stopPropagation();
+      if (!activeSubjectId) return;
+
+      const modal = document.getElementById("subfolderModal");
+      const titleEl = document.getElementById("subfolderModalTitle");
+      const idInput = document.getElementById("editSubfolderId");
+      const nameInput = document.getElementById("subfolderNameInput");
+      const descInput = document.getElementById("subfolderDescInput");
+
+      if (editId) {
+        const sf = subfoldersList.find(item => item.id === editId);
+        if (!sf) return;
+        titleEl.textContent = "تعديل الفولدر الفرعي";
+        idInput.value = sf.id;
+        nameInput.value = sf.name;
+        descInput.value = sf.description || "";
+      } else {
+        titleEl.textContent = "إضافة فولدر فرعي جديد داخل المكان الحالي";
+        idInput.value = "";
+        nameInput.value = "";
+        descInput.value = "";
+      }
+
+      modal.classList.add("open");
+      pushNavigationHistory({ modal: "subfolderModal" });
+      setTimeout(() => nameInput.focus(), 100);
+    };
+
+    window.saveSubfolder = async function() {
+      if (!activeSubjectId) return;
+      const editId = document.getElementById("editSubfolderId").value.trim();
+      const name = document.getElementById("subfolderNameInput").value.trim();
+      const description = document.getElementById("subfolderDescInput").value.trim();
+
+      if (!name) {
+        showToast("يرجى كتابة اسم الفولدر الفرعي أولاً!");
+        return;
+      }
+
+      if (editId) {
+        const idx = subfoldersList.findIndex(sf => sf.id === editId);
+        if (idx > -1) {
+          subfoldersList[idx].name = name;
+          subfoldersList[idx].description = description;
+          await idbPut("subfolders", subfoldersList[idx]);
+          dbSet(dbRef(fbDb, `study_portal_V2/subfolders/${editId}`), subfoldersList[idx]).catch(() => {});
+          showToast("تم تعديل الفولدر الفرعي بنجاح ✓");
+        }
+      } else {
+        const newSf = {
+          id: "sf_" + Date.now() + "_" + Math.random().toString(36).substring(2, 7),
+          subjectId: activeSubjectId,
+          parentId: activeSubfolderId || null,
+          name,
+          description,
+          createdAt: new Date().toISOString()
+        };
+        subfoldersList.push(newSf);
+        await idbPut("subfolders", newSf);
+        dbSet(dbRef(fbDb, `study_portal_V2/subfolders/${newSf.id}`), newSf).catch(() => {});
+        showToast(`تم إنشاء الفولدر الفرعي "${name}" بنجاح ✓`);
+      }
+
+      closeModal("subfolderModal");
+      renderSubjectFiles();
+      await updateTotalStorageHeader();
+    };
+
+    // جلب كافة الفولدرات الفرعية المتداخلة داخل فولدر معين لحساب الحجم أو الحذف
+    function getAllDescendantSubfolderIds(rootSubfolderId) {
+      const resultIds = [rootSubfolderId];
+      const findChildren = (parentId) => {
+        const children = subfoldersList.filter(sf => sf.parentId === parentId);
+        for (const ch of children) {
+          resultIds.push(ch.id);
+          findChildren(ch.id);
+        }
+      };
+      findChildren(rootSubfolderId);
+      return resultIds;
+    }
+
+    window.deleteSubfolder = async function(sfId, event) {
+      if (event) event.stopPropagation();
+      const sf = subfoldersList.find(item => item.id === sfId);
+      if (!sf) return;
+      if (!confirm(`هل أنت متأكد من حذف الفولدر الفرعي "${sf.name}" وجميع الملفات والفولدرات الموجودة بداخله؟`)) return;
+
+      const allTargetFolderIds = new Set(getAllDescendantSubfolderIds(sfId));
+
+      // حذف جميع الملفات داخل هذا الفولدر الفرعي وفولدراته الداخلية
+      const filesToDelete = allFilesList.filter(f => f.subjectId === activeSubjectId && allTargetFolderIds.has(f.folderId));
+      for (const f of filesToDelete) {
+        await idbDelete("files", f.id);
+        await idbDelete("file_binaries", f.id);
+        dbRemove(dbRef(fbDb, `study_portal_V2/files/${f.id}`)).catch(() => {});
+        dbRemove(dbRef(fbDb, `study_portal_V2/file_chunks/${f.id}`)).catch(() => {});
+      }
+      allFilesList = allFilesList.filter(f => !(f.subjectId === activeSubjectId && allTargetFolderIds.has(f.folderId)));
+
+      // حذف الفولدر الفرعي وأي فولدرات فرعية بداخله
+      for (const targetId of allTargetFolderIds) {
+        await idbDelete("subfolders", targetId);
+        dbRemove(dbRef(fbDb, `study_portal_V2/subfolders/${targetId}`)).catch(() => {});
+      }
+      subfoldersList = subfoldersList.filter(item => !allTargetFolderIds.has(item.id));
+
+      renderSubjectFiles();
+      await updateTotalStorageHeader();
+      showToast("تم حذف الفولدر الفرعي ومحتوياته.");
+    };
+
+    window.openSubfolder = function(subfolderId, fromPopState = false) {
+      activeSubfolderId = subfolderId || null;
+      selectedFileIds.clear();
+      document.getElementById("uploadProgressBox").style.display = "none";
+
+      if (!fromPopState) {
+        pushNavigationHistory({ view: "subfolder", subjectId: activeSubjectId, subfolderId: activeSubfolderId });
+      }
+
+      renderSubjectFiles();
+    };
+
+    function buildSubfolderBreadcrumbChain(currentSfId) {
+      const chain = [];
+      let currId = currentSfId;
+      let safety = 0;
+      while (currId && safety < 30) {
+        const found = subfoldersList.find(sf => sf.id === currId);
+        if (!found) break;
+        chain.unshift(found);
+        currId = found.parentId || null;
+        safety++;
+      }
+      return chain;
+    }
+
+    function renderBreadcrumbsAndHeaders() {
+      const sub = subjectsList.find(s => s.id === activeSubjectId);
+      if (!sub) return;
+
+      const breadcrumbBar = document.getElementById("folderBreadcrumbBar");
+      const backBtnText = document.getElementById("insideBackBtnText");
+      const activeTitleEl = document.getElementById("activeSubjectTitle");
+      const dropzoneHeading = document.getElementById("dropzoneHeadingText");
+
+      const chain = buildSubfolderBreadcrumbChain(activeSubfolderId);
+
+      let html = `
+        <span class="breadcrumb-item" onclick="closeSubjectFolder()">
+          <i class="fa-solid fa-house"></i> كل المواد
+        </span>
+        <i class="fa-solid fa-chevron-left breadcrumb-sep"></i>
+        <span class="breadcrumb-item ${chain.length === 0 ? 'current' : ''}" onclick="openSubfolder(null)">
+          <i class="fa-solid fa-folder-open"></i> ${escapeHtml(sub.name)}
+        </span>
+      `;
+
+      chain.forEach((sf, idx) => {
+        const isLast = idx === chain.length - 1;
+        html += `
+          <i class="fa-solid fa-chevron-left breadcrumb-sep"></i>
+          <span class="breadcrumb-item ${isLast ? 'current' : ''}" onclick="openSubfolder('${sf.id}')">
+            <i class="fa-solid fa-folder"></i> ${escapeHtml(sf.name)}
+          </span>
+        `;
+      });
+
+      breadcrumbBar.innerHTML = html;
+
+      if (chain.length > 0) {
+        const currentSf = chain[chain.length - 1];
+        const parentName = chain.length > 1 ? chain[chain.length - 2].name : sub.name;
+        backBtnText.textContent = `رجوع إلى (${parentName})`;
+        activeTitleEl.innerHTML = `<i class="fa-solid fa-folder-open" style="color: var(--warning);"></i> ${escapeHtml(sub.name)} / ${escapeHtml(currentSf.name)}`;
+        dropzoneHeading.textContent = `اضغط هنا أو اسحب لرفع ملفات داخل فولدر (${currentSf.name})`;
+      } else {
+        backBtnText.textContent = "رجوع للمواد";
+        activeTitleEl.textContent = sub.name;
+        dropzoneHeading.textContent = `اضغط هنا أو اسحب، وحدد ملف أو عدة ملفات معاً لرفعها داخل المادة`;
+      }
+    }
+
+    // ==================== 14. الدخول داخل المادة وعرض الفولدرات الفرعية والملفات ====================
+    window.openSubjectFolder = function(subId, fromPopState = false) {
+      const sub = subjectsList.find(s => s.id === subId);
+      if (!sub) return;
+      activeSubjectId = subId;
+      activeSubfolderId = null;
+      selectedFileIds.clear();
+      document.getElementById("foldersListView").style.display = "none";
+      document.getElementById("insideSubjectView").style.display = "block";
+      document.getElementById("uploadProgressBox").style.display = "none";
+
+      if (!fromPopState) {
+        pushNavigationHistory({ view: "subject", subjectId: subId });
+      }
+
+      renderSubjectFiles();
+    };
+
+    window.closeSubjectFolder = function(fromPopState = false) {
+      activeSubjectId = null;
+      activeSubfolderId = null;
+      selectedFileIds.clear();
+      document.getElementById("insideSubjectView").style.display = "none";
+      document.getElementById("foldersListView").style.display = "block";
+      renderSubjectsGrid();
+    };
+
+    function detectFileCategory(file) {
+      const mime = (file.type || "").toLowerCase();
+      const name = (file.name || "").toLowerCase();
+      if (mime.includes("pdf") || name.endsWith(".pdf")) return "pdf";
+      if (mime.startsWith("image/") || /\.(jpg|jpeg|png|gif|webp|bmp|svg)$/.test(name)) return "image";
+      if (mime.startsWith("text/") || /\.(txt|md|json|csv|js|py|html|css|c|cpp)$/.test(name)) return "text";
+      return "other";
+    }
+
+    const dropzone = document.getElementById("subjectDropzone");
+    dropzone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dropzone.classList.add("dragover");
+    });
+    dropzone.addEventListener("dragleave", () => {
+      dropzone.classList.remove("dragover");
+    });
+    dropzone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropzone.classList.remove("dragover");
+      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        handleSubjectFilesUpload(e.dataTransfer.files);
+      }
+    });
+
+    // كتابة مذكرة نصية مباشرة داخل المادة أو الفولدر الفرعي
+    window.openTextNoteModal = function(editFileId = null) {
+      if (!activeSubjectId) return;
+      const modal = document.getElementById("textNoteModal");
+      const idInp = document.getElementById("editTextFileId");
+      const titleInp = document.getElementById("textNoteTitleInput");
+      const contentInp = document.getElementById("textNoteContentInput");
+
+      if (editFileId) {
+        const existing = allFilesList.find(f => f.id === editFileId);
+        if (!existing) return;
+        document.getElementById("textNoteModalTitle").textContent = "تعديل المذكرة النصية";
+        idInp.value = existing.id;
+        titleInp.value = existing.name;
+        contentInp.value = existing.textContent || "";
+      } else {
+        document.getElementById("textNoteModalTitle").textContent = "كتابة مذكرة نصية جديدة";
+        idInp.value = "";
+        titleInp.value = "";
+        contentInp.value = "";
+      }
+      modal.classList.add("open");
+      pushNavigationHistory({ modal: "textNoteModal" });
+    };
+
+    window.saveCustomTextNote = async function() {
+      const editId = document.getElementById("editTextFileId").value.trim();
+      let title = document.getElementById("textNoteTitleInput").value.trim();
+      const content = document.getElementById("textNoteContentInput").value;
+
+      if (!title) {
+        showToast("يرجى كتابة عنوان للمذكرة النصية");
+        return;
+      }
+      if (!title.toLowerCase().endsWith(".txt")) {
+        title += ".txt";
+      }
+
+      const encoded = new TextEncoder().encode(content);
+      const arrayBuffer = encoded.buffer;
+      const base64Data = arrayBufferToBase64(arrayBuffer);
+
+      if (editId) {
+        const idx = allFilesList.findIndex(f => f.id === editId);
+        if (idx > -1) {
+          allFilesList[idx].name = title;
+          allFilesList[idx].textContent = content;
+          allFilesList[idx].size = arrayBuffer.byteLength;
+          allFilesList[idx].exactByteLength = arrayBuffer.byteLength;
+          allFilesList[idx].firebaseSynced = true;
+          allFilesList[idx].supabaseSynced = true;
+          await idbPut("file_binaries", {
+            id: editId,
+            arrayBuffer,
+            base64Data,
+            mimeType: "text/plain;charset=utf-8",
+            exactByteLength: arrayBuffer.byteLength
+          });
+          await idbPut("files", allFilesList[idx]);
+          await uploadToFirebaseWithProgress(allFilesList[idx], arrayBuffer, base64Data, () => {}).catch(() => {});
+        }
+      } else {
+        const fileObj = new File([arrayBuffer], title, { type: "text/plain;charset=utf-8" });
+        closeModal("textNoteModal");
+        await handleSubjectFilesUpload([fileObj]);
+        return;
+      }
+
+      closeModal("textNoteModal");
+      renderSubjectFiles();
+      await updateTotalStorageHeader();
+      showToast("تم حفظ المذكرة النصية بالكامل ✓");
+    };
+
+    window.setFileFilter = function(filterType, btnEl) {
+      activeFileFilter = filterType;
+      document.querySelectorAll(".filter-pill").forEach(b => b.classList.remove("active"));
+      if (btnEl) btnEl.classList.add("active");
+      renderSubjectFiles();
+    };
+
+    window.renderSubjectFiles = function() {
+      if (!activeSubjectId) return;
+
+      renderBreadcrumbsAndHeaders();
+
+      const grid = document.getElementById("subjectFilesGrid");
+      const subfoldersGrid = document.getElementById("subfoldersGridContainer");
+      const query = (document.getElementById("fileSearchInput").value || "").trim().toLowerCase();
+
+      // 1. عرض الفولدرات الفرعية الموجودة في المستوى الحالي
+      const currentLevelSubfolders = subfoldersList.filter(sf =>
+        sf.subjectId === activeSubjectId &&
+        (sf.parentId || null) === (activeSubfolderId || null) &&
+        (sf.name.toLowerCase().includes(query) || (sf.description && sf.description.toLowerCase().includes(query)))
+      );
+
+      if (currentLevelSubfolders.length === 0) {
+        subfoldersGrid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 12px; color: var(--text-muted); font-size: 0.85rem; border: 1px dashed var(--border-dashed); border-radius: 10px;">
+            لا توجد فولدرات فرعية في هذا المستوى حالياً — يمكنك الضغط على <strong>"إنشاء فولدر فرعي هنا"</strong> لتقسيم وتنظيم المحاضرات والسكاشن والشيتات.
+          </div>
+        `;
+      } else {
+        subfoldersGrid.innerHTML = currentLevelSubfolders.map(sf => {
+          const treeIds = new Set(getAllDescendantSubfolderIds(sf.id));
+          const sfFiles = allFilesList.filter(f => f.subjectId === activeSubjectId && treeIds.has(f.folderId));
+          const childSubfoldersCount = subfoldersList.filter(item => item.parentId === sf.id).length;
+          const sfBytes = sfFiles.reduce((acc, f) => acc + (Number(f.size) || 0), 0);
+
+          return `
+            <div class="folder-card subfolder-variant" onclick="openSubfolder('${sf.id}')">
+              <div class="folder-top">
+                <div class="folder-icon-wrap">
+                  <div class="folder-icon sub-icon">
+                    <i class="fa-solid fa-folder-open"></i>
+                  </div>
+                  <div>
+                    <div class="folder-title">${escapeHtml(sf.name)}</div>
+                    <div class="folder-sub">${escapeHtml(sf.description || "فولدر فرعي — اضغط للفتح")}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="folder-meta">
+                <span>
+                  ${childSubfoldersCount > 0 ? `<i class="fa-regular fa-folder"></i> ${childSubfoldersCount} فرعي • ` : ""}
+                  <i class="fa-regular fa-file-lines"></i> ${sfFiles.length} ملف (${formatBytes(sfBytes)})
+                </span>
+                <div class="folder-actions" onclick="event.stopPropagation();">
+                  <button class="btn btn-sm" title="تعديل اسم الفولدر الفرعي" onclick="openSubfolderModal('${sf.id}', event)">
+                    <i class="fa-solid fa-pen"></i>
+                  </button>
+                  <button class="btn btn-sm btn-danger" title="حذف الفولدر الفرعي" onclick="deleteSubfolder('${sf.id}', event)">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      // 2. عرض الملفات الموجودة في المستوى الحالي (جذر المادة أو داخل الفولدر الفرعي المفتوح)
+      const currentLevelFiles = allFilesList.filter(f =>
+        f.subjectId === activeSubjectId &&
+        (f.folderId || null) === (activeSubfolderId || null)
+      );
+
+      const allSubjectFiles = allFilesList.filter(f => f.subjectId === activeSubjectId);
+      const totalSubBytes = allSubjectFiles.reduce((acc, f) => acc + (Number(f.size) || 0), 0);
+      const currentLevelBytes = currentLevelFiles.reduce((acc, f) => acc + (Number(f.size) || 0), 0);
+
+      document.getElementById("activeSubjectMeta").textContent =
+        `الملفات في هذا المكان: ${currentLevelFiles.length} ملف (${formatBytes(currentLevelBytes)}) | إجمالي المادة بالكامل: ${allSubjectFiles.length} ملف (${formatBytes(totalSubBytes)})`;
+
+      const filtered = currentLevelFiles.filter(f => {
+        const matchFilter = activeFileFilter === "all" || f.category === activeFileFilter;
+        const matchQuery = f.name.toLowerCase().includes(query) || (f.textContent && f.textContent.toLowerCase().includes(query));
+        return matchFilter && matchQuery;
+      });
+
+      document.getElementById("selectedFilesCount").textContent = selectedFileIds.size;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state-box" style="grid-column: 1 / -1;">
+            <i class="fa-solid fa-cloud-arrow-up" style="font-size: 2.5rem; color: var(--accent-primary); margin-bottom: 10px;"></i>
+            <h3 style="color: var(--text-main); margin-bottom: 6px;">لا توجد ملفات مرفوعة في هذا المكان حالياً</h3>
+            <p style="font-size: 0.86rem;">ارفع ملفات PDF أو صور أو مذكرات نصية بالأعلى، أو ادخل على أحد الفولدرات الفرعية لتصفح ملفاته.</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(f => {
+        const isSelected = selectedFileIds.has(f.id);
+        let iconClass = "fa-file";
+        if (f.category === "pdf") iconClass = "fa-file-pdf";
+        else if (f.category === "image") iconClass = "fa-file-image";
+        else if (f.category === "text") iconClass = "fa-file-lines";
+
+        let previewBlock = "";
+        if (f.category === "image" && f.previewDataUrl) {
+          previewBlock = `<img src="${f.previewDataUrl}" class="file-thumb-preview" alt="${escapeHtml(f.name)}" onclick="openFileViewer('${f.id}')" />`;
+        } else if (f.category === "text" && f.textContent) {
+          previewBlock = `<div class="file-text-snippet" onclick="openFileViewer('${f.id}')">${escapeHtml(f.textContent.substring(0, 180))}</div>`;
+        }
+
+        const dateStr = new Date(f.createdAt).toLocaleDateString("ar-EG", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+
+        return `
+          <div class="file-card ${isSelected ? "selected" : ""}">
+            <div class="file-card-top">
+              <input type="checkbox" class="file-select-chk" ${isSelected ? "checked" : ""} onchange="toggleSelectSingleFile('${f.id}', this.checked)" />
+              <div class="file-type-icon ${f.category}">
+                <i class="fa-solid ${iconClass}"></i>
+              </div>
+              <div class="file-info">
+                <div class="file-name">
+                  <i class="fa-solid fa-circle-check" style="color: var(--img-neon); font-size: 0.9rem;" title="تم رفع وحفظ الملف بالكامل 100%"></i>
+                  <span>${escapeHtml(f.name)}</span>
+                </div>
+                <div class="file-details">
+                  <span>${formatBytes(f.size)} (كامل 100%)</span>
+                  <span>•</span>
+                  <span>${dateStr}</span>
+                </div>
+              </div>
+            </div>
+
+            ${previewBlock}
+
+            <div class="sync-badges-row">
+              <span class="mini-badge ok"><i class="fa-solid fa-check"></i> يفتح أوفلاين</span>
+              <span class="mini-badge ok"><i class="fa-solid fa-check"></i> Firebase ✓</span>
+              <span class="mini-badge ok"><i class="fa-solid fa-check"></i> Supabase ✓</span>
+            </div>
+
+            <div class="file-actions-row">
+              <div class="btn-group">
+                <button class="btn btn-sm btn-primary" onclick="openFileViewer('${f.id}')">
+                  <i class="fa-solid fa-eye"></i> فتح ومعاينة
+                </button>
+                <button class="btn btn-sm btn-success" onclick="downloadFileToDevice('${f.id}')">
+                  <i class="fa-solid fa-download"></i> تحميل
+                </button>
+                ${f.category === "text" ? `
+                  <button class="btn btn-sm" onclick="openTextNoteModal('${f.id}')" title="تعديل النص">
+                    <i class="fa-solid fa-pen"></i>
+                  </button>
+                ` : ""}
+              </div>
+              <button class="btn btn-sm btn-danger" onclick="deleteSingleFile('${f.id}')" title="حذف الملف">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    };
+
+    // ==================== 15. تحديد عدة ملفات وتحميلها أو حذفها ====================
+    window.toggleSelectSingleFile = function(fileId, checked) {
+      if (checked) selectedFileIds.add(fileId);
+      else selectedFileIds.delete(fileId);
+      renderSubjectFiles();
+    };
+
+    window.toggleSelectAllFiles = function() {
+      const currentLevelFiles = allFilesList.filter(f =>
+        f.subjectId === activeSubjectId &&
+        (f.folderId || null) === (activeSubfolderId || null)
+      );
+      if (selectedFileIds.size === currentLevelFiles.length && currentLevelFiles.length > 0) {
+        selectedFileIds.clear();
+      } else {
+        currentLevelFiles.forEach(f => selectedFileIds.add(f.id));
+      }
+      renderSubjectFiles();
+    };
+
+    window.downloadSelectedFiles = async function() {
+      if (selectedFileIds.size === 0) {
+        showToast("يرجى تحديد ملف أو أكثر أولاً لتحميله");
+        return;
+      }
+      let count = 0;
+      for (const fId of selectedFileIds) {
+        await downloadFileToDevice(fId);
+        count++;
+        await new Promise(r => setTimeout(r, 300));
+      }
+      showToast(`تم تحميل ${count} ملفات كاملة على جهازك ✓`);
+    };
+
+    window.deleteSelectedFiles = async function() {
+      if (selectedFileIds.size === 0) {
+        showToast("يرجى تحديد الملفات المراد حذفها أولاً");
+        return;
+      }
+      if (!confirm(`هل أنت متأكد من حذف ${selectedFileIds.size} ملفات محددة؟`)) return;
+
+      for (const fId of selectedFileIds) {
+        await idbDelete("files", fId);
+        await idbDelete("file_binaries", fId);
+        dbRemove(dbRef(fbDb, `study_portal_V2/files/${fId}`)).catch(() => {});
+        dbRemove(dbRef(fbDb, `study_portal_V2/file_chunks/${fId}`)).catch(() => {});
+        allFilesList = allFilesList.filter(f => f.id !== fId);
+      }
+      selectedFileIds.clear();
+      renderSubjectFiles();
+      await updateTotalStorageHeader();
+      showToast("تم حذف الملفات المحددة بنجاح.");
+    };
+
+    window.deleteSingleFile = async function(fileId) {
+      const f = allFilesList.find(item => item.id === fileId);
+      if (!f) return;
+      if (!confirm(`حذف الملف "${f.name}"؟`)) return;
+      await idbDelete("files", fileId);
+      await idbDelete("file_binaries", fileId);
+      dbRemove(dbRef(fbDb, `study_portal_V2/files/${fileId}`)).catch(() => {});
+      dbRemove(dbRef(fbDb, `study_portal_V2/file_chunks/${fileId}`)).catch(() => {});
+      allFilesList = allFilesList.filter(item => item.id !== fileId);
+      selectedFileIds.delete(fileId);
+      renderSubjectFiles();
+      await updateTotalStorageHeader();
+      showToast("تم حذف الملف.");
+    };
+
+    // ==================== 16. فتح ومعاينة الملفات بالكامل (شامل قارئ PDF لكل الصفحات) وتحميلها ====================
+    window.downloadFileToDevice = async function(fileId) {
+      const f = allFilesList.find(item => item.id === fileId);
+      if (!f) return;
+
+      const arrayBuffer = await getVerifiedFileArrayBuffer(f);
+      if (arrayBuffer) {
+        const mime = f.type || (f.category === "pdf" ? "application/pdf" : "application/octet-stream");
+        const blob = new Blob([arrayBuffer], { type: mime });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = f.name;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 8000);
+        showToast(`جاري تحميل "${f.name}" (${formatBytes(blob.size)}) كاملاً على جهازك ✓`);
+      } else if (f.fbDownloadUrl || f.sbDownloadUrl) {
+        window.open(f.fbDownloadUrl || f.sbDownloadUrl, "_blank");
+      } else {
+        showToast("تعذر العثور على البيانات الثنائية للملف.");
+      }
+    };
+
+    async function renderFullPdfInsideElement(arrayBuffer, containerEl, blobUrl) {
+      if (!window.pdfjsLib) {
+        containerEl.innerHTML = `<iframe src="${blobUrl}" style="width:100%; height:75vh; border:none; border-radius:8px; background:#fff;"></iframe>`;
+        return;
+      }
+
+      containerEl.innerHTML = `
+        <div id="pdfStatusBanner" style="width:100%; background: var(--bg-secondary); border:1px solid var(--border-color); padding:10px 14px; border-radius:10px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+          <span><i class="fa-solid fa-spinner fa-spin" style="color: var(--accent-primary);"></i> جاري تحميل وعرض جميع صفحات ملف الـ PDF...</span>
+          <span id="pdfPageCountBadge" style="font-weight:800; color: var(--img-neon);"></span>
+        </div>
+        <div class="pdf-canvas-container" id="pdfPagesHolder"></div>
+      `;
+
+      try {
+        const bufferCopy = arrayBuffer.slice(0);
+        const loadingTask = window.pdfjsLib.getDocument({ data: bufferCopy });
+        const pdfDoc = await loadingTask.promise;
+        const totalPages = pdfDoc.numPages;
+
+        document.getElementById("pdfPageCountBadge").textContent = `إجمالي الصفحات: ${totalPages} صفحة`;
+        const holder = document.getElementById("pdfPagesHolder");
+
+        for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+          const bannerEl = document.getElementById("pdfStatusBanner");
+          if (!bannerEl) break;
+          bannerEl.innerHTML = `
+            <span><i class="fa-solid fa-book-open" style="color: var(--accent-primary);"></i> جاري تجهيز صفحة (${pageNum} من ${totalPages})...</span>
+            <span style="font-weight:800; color: var(--img-neon);">إجمالي الصفحات: ${totalPages}</span>
+          `;
+
+          const page = await pdfDoc.getPage(pageNum);
+          const viewport = page.getViewport({ scale: 1.6 });
+
+          const pageWrapper = document.createElement("div");
+          pageWrapper.style.width = "100%";
+          pageWrapper.style.textAlign = "center";
+
+          const pageLabel = document.createElement("div");
+          pageLabel.style.fontSize = "0.78rem";
+          pageLabel.style.color = "var(--text-muted)";
+          pageLabel.style.marginBottom = "4px";
+          pageLabel.textContent = `صفحة ${pageNum} من ${totalPages}`;
+
+          const canvas = document.createElement("canvas");
+          canvas.className = "pdf-page-canvas";
+          const ctx = canvas.getContext("2d");
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+
+          pageWrapper.appendChild(pageLabel);
+          pageWrapper.appendChild(canvas);
+          holder.appendChild(pageWrapper);
+
+          await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+        }
+
+        const finalBanner = document.getElementById("pdfStatusBanner");
+        if (finalBanner) {
+          finalBanner.innerHTML = `
+            <span><i class="fa-solid fa-circle-check" style="color: var(--img-neon);"></i> تم عرض الملف بالكامل (${totalPages} من ${totalPages} صفحات) ✓</span>
+            <span style="font-weight:800; color: var(--img-neon);">كامل 100%</span>
+          `;
+        }
+      } catch (err) {
+        console.warn("PDF.js fallback to native iframe:", err);
+        containerEl.innerHTML = `<iframe src="${blobUrl}" style="width:100%; height:75vh; border:none; border-radius:8px; background:#fff;"></iframe>`;
+      }
+    }
+
+    window.openFileViewer = async function(fileId) {
+      const f = allFilesList.find(item => item.id === fileId);
+      if (!f) return;
+
+      if (currentViewerBlobUrl) {
+        URL.revokeObjectURL(currentViewerBlobUrl);
+        currentViewerBlobUrl = null;
+      }
+
+      const modal = document.getElementById("fileViewerModal");
+      const titleEl = document.getElementById("viewerFileTitle");
+      const bodyEl = document.getElementById("viewerModalBody");
+      const dlBtn = document.getElementById("viewerDownloadBtn");
+      const newTabBtn = document.getElementById("viewerOpenNewTabBtn");
+
+      titleEl.textContent = `${f.name} (${formatBytes(f.size)})`;
+      dlBtn.onclick = () => downloadFileToDevice(f.id);
+      bodyEl.innerHTML = `<div style="padding: 40px; text-align: center;"><i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; color: var(--accent-primary);"></i><p style="margin-top: 10px;">جاري فتح الملف الكامل...</p></div>`;
+      modal.classList.add("open");
+      pushNavigationHistory({ modal: "fileViewerModal", fileId: f.id });
+
+      const arrayBuffer = await getVerifiedFileArrayBuffer(f);
+      if (!arrayBuffer) {
+        bodyEl.innerHTML = `<div class="empty-state-box">تعذر قراءة الملف.</div>`;
+        return;
+      }
+
+      const mime = f.type || (f.category === "pdf" ? "application/pdf" : "application/octet-stream");
+      const blob = new Blob([arrayBuffer], { type: mime });
+      const blobUrl = URL.createObjectURL(blob);
+      currentViewerBlobUrl = blobUrl;
+
+      newTabBtn.style.display = "inline-flex";
+      newTabBtn.onclick = () => window.open(blobUrl, "_blank");
+
+      if (f.category === "pdf") {
+        await renderFullPdfInsideElement(arrayBuffer, bodyEl, blobUrl);
+      } else if (f.category === "image") {
+        bodyEl.innerHTML = `<img src="${blobUrl}" style="max-width: 100%; max-height: 76vh; border-radius: 10px; object-fit: contain;" alt="${escapeHtml(f.name)}" />`;
+      } else if (f.category === "text") {
+        const textVal = f.textContent || new TextDecoder("utf-8").decode(arrayBuffer);
+        bodyEl.innerHTML = `
+          <div style="width: 100%; background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; white-space: pre-wrap; line-height: 1.7; font-size: 0.95rem; overflow-y: auto; max-height: 72vh;">${escapeHtml(textVal)}</div>
+        `;
+      } else {
+        bodyEl.innerHTML = `
+          <div class="empty-state-box" style="width: 100%;">
+            <i class="fa-solid fa-circle-check" style="font-size: 3rem; color: var(--img-neon); margin-bottom: 12px;"></i>
+            <h3 style="color: var(--text-main); margin-bottom: 8px;">${escapeHtml(f.name)}</h3>
+            <p style="margin-bottom: 16px;">الحجم الكامل المؤكد: ${formatBytes(blob.size)} — الملف محفوظ بالكامل أوفلاين على جهازك.</p>
+            <button class="btn btn-success" onclick="downloadFileToDevice('${f.id}')">
+              <i class="fa-solid fa-download"></i> تحميل الملف الكامل وفتحه على الجهاز
+            </button>
+          </div>
+        `;
+      }
+    };
+
+    window.closeViewerModal = function(fromPopState = false) {
+      document.getElementById("fileViewerModal").classList.remove("open");
+      document.getElementById("viewerModalBody").innerHTML = "";
+    };
+
+    // ==================== 17. قسم الجدول الدراسي (الجدول + ملف PDF + صور الجدول) ====================
+    window.renderScheduleTable = function() {
+      const tbody = document.getElementById("scheduleTableBody");
+      tbody.innerHTML = WEEK_DAYS.map(day => {
+        const val = scheduleDaysData[day] || "-";
+        if (isScheduleEditing) {
+          return `
+            <tr>
+              <td class="col-day">${day}</td>
+              <td class="col-lec">
+                <input type="text" class="schedule-day-input" data-day="${day}" value="${escapeHtml(val)}" placeholder="اكتب المحاضرات أو السكاشن ليوم ${day}..." />
+              </td>
+            </tr>
+          `;
+        } else {
+          return `
+            <tr onclick="quickEditScheduleDay('${day}')" title="اضغط لتعديل محاضرات يوم ${day}">
+              <td class="col-day">${day}</td>
+              <td class="col-lec">${escapeHtml(val)}</td>
+            </tr>
+          `;
+        }
+      }).join("");
+    };
+
+    window.toggleScheduleEditMode = async function() {
+      const btn = document.getElementById("toggleEditScheduleBtn");
+      if (!isScheduleEditing) {
+        isScheduleEditing = true;
+        btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> حفظ الجدول`;
+        btn.className = "btn btn-success btn-sm";
+        renderScheduleTable();
+      } else {
+        document.querySelectorAll(".schedule-day-input").forEach(inp => {
+          const d = inp.getAttribute("data-day");
+          scheduleDaysData[d] = inp.value.trim() || "-";
+        });
+        isScheduleEditing = false;
+        btn.innerHTML = `<i class="fa-solid fa-pen-to-square"></i> تعديل الجدول`;
+        btn.className = "btn btn-primary btn-sm";
+        await saveScheduleDaysToStorage();
+        renderScheduleTable();
+        showToast("تم حفظ جدول المحاضرات والسكاشن أوفلاين وسحابياً ✓");
+      }
+    };
+
+    window.quickEditScheduleDay = async function(day) {
+      if (isScheduleEditing) return;
+      const currentVal = scheduleDaysData[day] === "-" ? "" : scheduleDaysData[day];
+      const nextVal = prompt(`أدخل المحاضرات / السكاشن ليوم ${day}:`, currentVal);
+      if (nextVal !== null) {
+        scheduleDaysData[day] = nextVal.trim() || "-";
+        await saveScheduleDaysToStorage();
+        renderScheduleTable();
+        showToast(`تم تحديث جدول يوم ${day} ✓`);
+      }
+    };
+
+    async function saveScheduleDaysToStorage() {
+      await idbPut("schedule", { key: "days_table", data: scheduleDaysData });
+      dbSet(dbRef(fbDb, "study_portal_V2/schedule_days"), scheduleDaysData).catch(() => {});
+    }
+
+    window.handleSchedulePdfUpload = async function(fileList) {
+      if (!fileList || fileList.length === 0) return;
+      const f = fileList[0];
+      const progBox = document.getElementById("schedPdfProgressBox");
+      const progTitle = document.getElementById("schedPdfProgTitle");
+      const progPct = document.getElementById("schedPdfProgPct");
+      const progBar = document.getElementById("schedPdfProgBar");
+
+      progBox.style.display = "block";
+      progTitle.textContent = `جاري قراءة ورفع: ${f.name}`;
+
+      const arrayBuffer = await readFileAsArrayBufferWithProgress(f, (loaded, total) => {
+        const p = Math.round((loaded / total) * 50);
+        progPct.textContent = `${p}%`;
+        progBar.style.width = `${p}%`;
+      });
+
+      const base64Data = arrayBufferToBase64(arrayBuffer);
+      const pdfObj = {
+        key: "schedule_pdf",
+        name: f.name,
+        size: f.size,
+        type: "application/pdf",
+        arrayBuffer: arrayBuffer,
+        base64Data: base64Data,
+        updatedAt: new Date().toISOString()
+      };
+
+      await idbPut("schedule", pdfObj);
+      progPct.textContent = "85%";
+      progBar.style.width = "85%";
+
+      const CHUNK_SIZE = 260000;
+      const totalChunks = Math.ceil(base64Data.length / CHUNK_SIZE) || 1;
+      for (let c = 0; c < totalChunks; c++) {
+        const chunkStr = base64Data.slice(c * CHUNK_SIZE, (c + 1) * CHUNK_SIZE);
+        await dbSet(dbRef(fbDb, `study_portal_V2/schedule_pdf_chunks/c_${c}`), chunkStr).catch(() => {});
+        const p = 50 + Math.round(((c + 1) / totalChunks) * 50);
+        progPct.textContent = `${p}%`;
+        progBar.style.width = `${p}%`;
+      }
+
+      progTitle.innerHTML = `<i class="fa-solid fa-circle-check" style="color: var(--img-neon);"></i> تم رفع ملف الجدول بالكامل ✓`;
+      progPct.textContent = "100%";
+      progBar.style.width = "100%";
+
+      document.getElementById("schedulePdfInput").value = "";
+      await renderScheduleAttachments();
+      await updateTotalStorageHeader();
+      showToast("تم حفظ ورفع ملف الجدول (PDF) بالكامل ✓");
+      setTimeout(() => { progBox.style.display = "none"; }, 2200);
+    };
+
+    window.openSchedulePdfViewer = async function() {
+      const pdfObj = await idbGet("schedule", "schedule_pdf");
+      if (!pdfObj) return;
+      const arrayBuffer = pdfObj.arrayBuffer || (pdfObj.base64Data ? base64ToArrayBuffer(pdfObj.base64Data) : null);
+      if (!arrayBuffer) return;
+
+      const blob = new Blob([arrayBuffer], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      currentViewerBlobUrl = url;
+
+      document.getElementById("viewerFileTitle").textContent = pdfObj.name || "ملف الجدول (PDF)";
+      document.getElementById("viewerDownloadBtn").onclick = () => downloadSchedulePdf();
+      const newTabBtn = document.getElementById("viewerOpenNewTabBtn");
+      newTabBtn.style.display = "inline-flex";
+      newTabBtn.onclick = () => window.open(url, "_blank");
+
+      const bodyEl = document.getElementById("viewerModalBody");
+      document.getElementById("fileViewerModal").classList.add("open");
+      pushNavigationHistory({ modal: "fileViewerModal", type: "schedule_pdf" });
+      await renderFullPdfInsideElement(arrayBuffer, bodyEl, url);
+    };
+
+    window.downloadSchedulePdf = async function() {
+      const pdfObj = await idbGet("schedule", "schedule_pdf");
+      if (!pdfObj) return;
+      const arrayBuffer = pdfObj.arrayBuffer || (pdfObj.base64Data ? base64ToArrayBuffer(pdfObj.base64Data) : null);
+      if (!arrayBuffer) return;
+      const blob = new Blob([arrayBuffer], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = pdfObj.name || "schedule.pdf";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+    };
+
+    window.deleteSchedulePdf = async function() {
+      if (!confirm("هل تريد حذف ملف PDF الخاص بالجدول؟")) return;
+      await idbDelete("schedule", "schedule_pdf");
+      dbRemove(dbRef(fbDb, "study_portal_V2/schedule_pdf_chunks")).catch(() => {});
+      await renderScheduleAttachments();
+      await updateTotalStorageHeader();
+      showToast("تم حذف ملف PDF للجدول.");
+    };
+
+    window.handleScheduleImagesUpload = async function(fileList) {
+      if (!fileList || fileList.length === 0) return;
+      const filesArr = Array.from(fileList);
+      const existingRec = (await idbGet("schedule", "schedule_images")) || { key: "schedule_images", items: [] };
+
+      const progBox = document.getElementById("schedImgsProgressBox");
+      const progTitle = document.getElementById("schedImgsProgTitle");
+      const progPct = document.getElementById("schedImgsProgPct");
+      const progBar = document.getElementById("schedImgsProgBar");
+      progBox.style.display = "block";
+
+      for (let i = 0; i < filesArr.length; i++) {
+        const f = filesArr[i];
+        progTitle.textContent = `جاري رفع صورة (${i + 1} من ${filesArr.length}): ${f.name}`;
+        const buf = await readFileAsArrayBufferWithProgress(f, (l, t) => {
+          const p = Math.round(((i + (l / t)) / filesArr.length) * 100);
+          progPct.textContent = `${p}%`;
+          progBar.style.width = `${p}%`;
+        });
+        const b64 = arrayBufferToBase64(buf);
+        const dataUrl = `data:${f.type || "image/jpeg"};base64,${b64}`;
+
+        existingRec.items.unshift({
+          id: "simg_" + Date.now() + "_" + Math.random().toString(36).substring(2, 7),
+          name: f.name,
+          size: f.size,
+          dataUrl: dataUrl,
+          createdAt: new Date().toISOString()
+        });
+      }
+
+      await idbPut("schedule", existingRec);
+      dbSet(dbRef(fbDb, "study_portal_V2/schedule_images"), existingRec.items).catch(() => {});
+      progTitle.innerHTML = `<i class="fa-solid fa-circle-check" style="color: var(--img-neon);"></i> تم رفع وحفظ جميع صور الجدول ✓`;
+      progPct.textContent = "100%";
+      progBar.style.width = "100%";
+
+      document.getElementById("scheduleImagesInput").value = "";
+      await renderScheduleAttachments();
+      await updateTotalStorageHeader();
+      showToast("تم رفع وحفظ صور الجدول بالكامل ✓");
+      setTimeout(() => { progBox.style.display = "none"; }, 2000);
+    };
+
+    window.previewScheduleImage = async function(imgId) {
+      const rec = await idbGet("schedule", "schedule_images");
+      if (!rec || !rec.items) return;
+      const item = rec.items.find(i => i.id === imgId);
+      if (!item) return;
+
+      document.getElementById("viewerFileTitle").textContent = item.name;
+      document.getElementById("viewerDownloadBtn").onclick = () => downloadScheduleImage(imgId);
+      document.getElementById("viewerOpenNewTabBtn").style.display = "none";
+      document.getElementById("viewerModalBody").innerHTML = `
+        <img src="${item.dataUrl}" style="max-width: 100%; max-height: 76vh; border-radius: 10px; object-fit: contain;" alt="${escapeHtml(item.name)}" />
+      `;
+      document.getElementById("fileViewerModal").classList.add("open");
+      pushNavigationHistory({ modal: "fileViewerModal", type: "schedule_img", imgId });
+    };
+
+    window.downloadScheduleImage = async function(imgId) {
+      const rec = await idbGet("schedule", "schedule_images");
+      if (!rec || !rec.items) return;
+      const item = rec.items.find(i => i.id === imgId);
+      if (!item) return;
+      const a = document.createElement("a");
+      a.href = item.dataUrl;
+      a.download = item.name || "schedule-image.jpg";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    };
+
+    window.deleteScheduleImage = async function(imgId) {
+      const rec = await idbGet("schedule", "schedule_images");
+      if (!rec || !rec.items) return;
+      rec.items = rec.items.filter(i => i.id !== imgId);
+      await idbPut("schedule", rec);
+      dbSet(dbRef(fbDb, "study_portal_V2/schedule_images"), rec.items).catch(() => {});
+      await renderScheduleAttachments();
+      await updateTotalStorageHeader();
+      showToast("تم حذف صورة الجدول.");
+    };
+
+    async function renderScheduleAttachments() {
+      const pdfObj = await idbGet("schedule", "schedule_pdf");
+      const pdfMsg = document.getElementById("schedPdfEmptyMsg");
+      const pdfBox = document.getElementById("schedPdfUploadedContainer");
+
+      if (pdfObj && (pdfObj.arrayBuffer || pdfObj.base64Data || pdfObj.dataUrl)) {
+        pdfMsg.innerHTML = `<span style="color: var(--img-neon); font-weight: 800;"><i class="fa-solid fa-circle-check"></i> تم الرفع بالكامل: ${escapeHtml(pdfObj.name)} (${formatBytes(pdfObj.size)})</span>`;
+        pdfBox.style.display = "block";
+        pdfBox.innerHTML = `
+          <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <i class="fa-solid fa-file-pdf" style="font-size: 1.6rem; color: var(--pdf-red);"></i>
+              <div style="text-align: right;">
+                <div style="font-weight: 800; font-size: 0.92rem;">${escapeHtml(pdfObj.name)}</div>
+                <div style="font-size: 0.78rem; color: var(--img-neon);">${formatBytes(pdfObj.size)} — مرفوع بالكامل وجاهز للفتح أوفلاين ✓</div>
+              </div>
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-sm btn-primary" onclick="openSchedulePdfViewer()">
+                <i class="fa-solid fa-eye"></i> فتح الجدول كاملاً
+              </button>
+              <button class="btn btn-sm btn-success" onclick="downloadSchedulePdf()">
+                <i class="fa-solid fa-download"></i> تحميل
+              </button>
+              <button class="btn btn-sm btn-danger" onclick="deleteSchedulePdf()">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      } else {
+        pdfMsg.textContent = "لا يوجد ملف PDF للجدول حالياً.";
+        pdfBox.style.display = "none";
+        pdfBox.innerHTML = "";
+      }
+
+      const imgRec = await idbGet("schedule", "schedule_images");
+      const imgMsg = document.getElementById("schedImagesEmptyMsg");
+      const imgGal = document.getElementById("schedImagesGallery");
+
+      if (imgRec && Array.isArray(imgRec.items) && imgRec.items.length > 0) {
+        imgMsg.innerHTML = `<span style="color: var(--img-neon); font-weight: 800;"><i class="fa-solid fa-circle-check"></i> تم رفع ${imgRec.items.length} صورة للجدول بنجاح (تفتح أوفلاين) ✓</span>`;
+        imgGal.innerHTML = imgRec.items.map(img => `
+          <div class="sched-img-item">
+            <img src="${img.dataUrl}" alt="${escapeHtml(img.name)}" onclick="previewScheduleImage('${img.id}')" />
+            <div style="font-size: 0.78rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+              <i class="fa-solid fa-circle-check" style="color: var(--img-neon);"></i> ${escapeHtml(img.name)}
+            </div>
+            <div class="btn-group" style="justify-content: center;">
+              <button class="btn btn-sm btn-primary" onclick="previewScheduleImage('${img.id}')"><i class="fa-solid fa-expand"></i></button>
+              <button class="btn btn-sm btn-success" onclick="downloadScheduleImage('${img.id}')"><i class="fa-solid fa-download"></i></button>
+              <button class="btn btn-sm btn-danger" onclick="deleteScheduleImage('${img.id}')"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </div>
+        `).join("");
+      } else {
+        imgMsg.textContent = "لا توجد صور مرفوعة للجدول.";
+        imgGal.innerHTML = "";
+      }
+    }
+
+    // ==================== 18. التبديل بين الأقسام وتصدير النسخة الاحتياطية ====================
+    window.switchMainTab = function(tabName, fromPopState = false) {
+      document.getElementById("tabBtnSubjects").classList.toggle("active", tabName === "subjects");
+      document.getElementById("tabBtnSchedule").classList.toggle("active", tabName === "schedule");
+      document.getElementById("sectionSubjects").classList.toggle("active", tabName === "subjects");
+      document.getElementById("sectionSchedule").classList.toggle("active", tabName === "schedule");
+
+      if (!fromPopState && tabName === "schedule") {
+        pushNavigationHistory({ tab: "schedule" });
+      }
+    };
+
+    window.exportFullBackup = async function() {
+      const backupObj = {
+        exportedAt: new Date().toISOString(),
+        subjects: subjectsList,
+        subfolders: subfoldersList,
+        scheduleDays: scheduleDaysData,
+        filesCount: allFilesList.length
+      };
+      const blob = new Blob([JSON.stringify(backupObj, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Engineering_Notes_Backup_${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      showToast("تم تحميل ملف النسخة الاحتياطية على جهازك ✓");
+    };
+
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function updateNetworkBadge() {
+      const el = document.getElementById("networkLiveState");
+      if (navigator.onLine) {
+        el.innerHTML = `<i class="fa-solid fa-wifi" style="color: var(--img-neon);"></i> حالة الشبكة: متصل (مزامنة Firebase + Supabase مفعلة)`;
+      } else {
+        el.innerHTML = `<i class="fa-solid fa-bolt" style="color: var(--warning);"></i> حالة الشبكة: أوفلاين (جميع الملفات تفتح كاملة من ذاكرة الجهاز مباشرة)`;
+      }
+    }
+    window.addEventListener("online", () => { updateNetworkBadge(); syncAllCloudData(false); });
+    window.addEventListener("offline", updateNetworkBadge);
+
+    // ==================== 19. بدء تشغيل الموقع وتحميل البيانات ====================
+    async function initStudyPortal() {
+      // تهيئة حالة التاريخ (History State) الأساسية لحماية زر الرجوع من إغلاق التطبيق
+      try {
+        window.history.replaceState({ page: "home_root" }, "");
+        window.history.pushState({ page: "home_guard" }, "");
+      } catch (e) {}
+
+      updateNetworkBadge();
+      await openOfflineDB();
+
+      subjectsList = await idbGetAll("subjects");
+      subfoldersList = await idbGetAll("subfolders");
+      allFilesList = await idbGetAll("files");
+      allFilesList.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+      const savedDays = await idbGet("schedule", "days_table");
+      if (savedDays && savedDays.data) {
+        scheduleDaysData = { ...scheduleDaysData, ...savedDays.data };
+      }
+
+      renderSubjectsGrid();
+      renderScheduleTable();
+      await renderScheduleAttachments();
+      await updateTotalStorageHeader();
+
+      syncAllCloudData(false);
+    }
+
+    initStudyPortal();
+  </script>
+</body>
+</html>

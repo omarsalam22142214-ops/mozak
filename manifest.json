@@ -1,0 +1,24 @@
+{
+  "name": "moz-main",
+  "short_name": "moz-main",
+  "description": "moz-main",
+  "start_url": "./index.html?v=v1794874399356",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#b57daf",
+  "icons": [
+    {
+      "src": "./icon-192.png?v=v1794874399356",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-512.png?v=v1794874399356",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
